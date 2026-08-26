@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我獨自升級 (Solo Leveling) 全主線史詩編年史 | Shadow Sovereign</title>
+  <meta name="description" content="專為《我獨自升級》(Solo Leveling) 動漫與漫畫粉絲打造的高保真一頁式展示網站。全12大史詩章節全紀錄、暗影真言『站起來！』震撼體驗、暗影軍團圖鑑、支配者與君王世界觀、屬性分配與即時戰役試煉。">
+  
+  <!-- Styling Sheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Canvas Elements -->
+  <div class="ambient-grid"></div>
+  <div class="ambient-auras">
+    <div class="aura-1"></div>
+    <div class="aura-2"></div>
+  </div>
+
+  <!-- Screen Alert Overlays -->
+  <!-- LEVEL UP overlay alert window -->
+  <div id="levelup-overlay" class="levelup-overlay">
+    <div class="levelup-banner-title">LEVEL UP</div>
+    <div class="levelup-banner-subtitle">你打破了系統的界限，屬性已大幅增強</div>
+  </div>
+
+  <!-- SYSTEM QUEST WINDOW MODAL -->
+  <div id="quest-modal" class="modal-overlay">
+    <div class="system-window system-quest-window">
+      <div class="system-window-header">
+        <span class="system-window-title">【系統每日任務】</span>
+        <button id="quest-close-btn" class="system-window-close">&times;</button>
+      </div>
+      <div class="system-window-body">
+        <div class="quest-header-status">
+          <div id="quest-modal-icon" class="system-quest-icon">!</div>
+          <div id="quest-status-badge" class="quest-status-badge">今日任務進行中</div>
+        </div>
+        <h4 class="system-quest-title">每日任務：準備變強的日常 (Daily Quest)</h4>
+        <p class="system-quest-desc">
+          「系統提示：每日限完成一次。若當日未完成訓練，將於午夜強制傳送至懲罰沙漠地下城存活4小時。」
+        </p>
+
+        <!-- Quest Objective Checklist -->
+        <div class="quest-checklist-box">
+          <div class="quest-checklist-title">【今日目標達成清單】(每日限定1次)</div>
+          <div class="quest-check-item">
+            <span class="check-icon">✓</span>
+            <span class="check-text">伏地挺身 (Push-ups)</span>
+            <span class="check-progress" id="quest-prog-pushup">[100 / 100]</span>
+          </div>
+          <div class="quest-check-item">
+            <span class="check-icon">✓</span>
+            <span class="check-text">仰臥起坐 (Sit-ups)</span>
+            <span class="check-progress" id="quest-prog-situp">[100 / 100]</span>
+          </div>
+          <div class="quest-check-item">
+            <span class="check-icon">✓</span>
+            <span class="check-text">深蹲 (Squats)</span>
+            <span class="check-progress" id="quest-prog-squat">[100 / 100]</span>
+          </div>
+          <div class="quest-check-item">
+            <span class="check-icon">✓</span>
+            <span class="check-text">長跑訓練 (10km Running)</span>
+            <span class="check-progress" id="quest-prog-run">[10 / 10 km]</span>
+          </div>
+        </div>
+
+        <div class="system-quest-rewards">
+          <div class="system-quest-rewards-title">結算獎勵 (限每日首次完成)：</div>
+          <div class="system-reward-item">
+            <span>1. 狀態完全恢復（消除疲勞）</span>
+            <span class="glow-text-primary">RECOVERY</span>
+          </div>
+          <div class="system-reward-item">
+            <span>2. 自由屬性點數 +5 點</span>
+            <span class="glow-text-primary" id="quest-reward-stat-txt">+5 PTS</span>
+          </div>
+          <div class="system-reward-item">
+            <span>3. 隨機補給箱 1 個</span>
+            <span class="glow-text-primary">1 BOX</span>
+          </div>
+        </div>
+
+        <!-- Cooldown timer display -->
+        <div id="quest-countdown-timer" class="quest-countdown-timer">
+          距離下次系統重置刷新：<span id="quest-timer-clock">--:--:--</span>
+        </div>
+
+        <div class="system-quest-btn-row">
+          <button id="quest-accept-btn" class="btn btn-primary btn-sm" style="margin-right: 10px;">完成訓練並結算獎勵</button>
+          <button id="quest-decline-btn" class="btn btn-secondary btn-sm" style="margin-right: 10px;">拒絕接受</button>
+          <button id="quest-return-btn" class="btn btn-secondary btn-sm">✕ 關閉視窗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORY CHAPTER DETAIL POPUP MODAL -->
+  <div id="chapter-modal" class="modal-overlay">
+    <div class="system-window chapter-modal-window">
+      <div class="system-window-header">
+        <span class="system-window-title" id="modal-chapter-badge">【史詩篇章詳情】</span>
+        <button id="chapter-close-btn" class="system-window-close">&times;</button>
+      </div>
+      <div class="system-window-body chapter-modal-body">
+        <div class="chapter-modal-meta">
+          <span class="chip" id="modal-chapter-tag">主線劇情</span>
+          <span class="chip chip-secondary" id="modal-chapter-era">暗影君王降臨錄</span>
+        </div>
+        <h3 class="chapter-modal-title" id="modal-chapter-title">章節標題</h3>
+        <div class="chapter-modal-quote" id="modal-chapter-quote">「經典名言與名場面」</div>
+        <div class="chapter-modal-text" id="modal-chapter-desc">
+          詳細劇情敘述...
+        </div>
+        <div class="chapter-modal-highlights" id="modal-chapter-highlights">
+          <!-- Dynamically generated bullet highlights -->
+        </div>
+        <div class="chapter-modal-footer">
+          <button id="modal-prev-chapter-btn" class="btn btn-secondary btn-sm">◀ 上一篇章</button>
+          <button id="modal-video-btn" class="btn btn-secondary btn-sm">▶️ 觀看此章解說</button>
+          <button id="modal-play-battle-btn" class="btn btn-primary btn-sm">⚔️ 立即進入實戰討伐</button>
+          <button id="modal-arise-trigger-btn" class="btn btn-secondary btn-sm">⚡ 感受暗影真言</button>
+          <button id="modal-next-chapter-btn" class="btn btn-secondary btn-sm">下一篇章 ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ambient Rumble Vignette layer for Arise spell -->
+  <div id="arise-overlay" class="arise-overlay-effect"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <span class="logo-icon"></span>
+        SHADOW SOVEREIGN
+      </a>
+      
+      <!-- Nav Links -->
+      <div class="nav-links-menu">
+        <a href="#saga-overview" class="nav-menu-link">全篇巡禮</a>
+        <a href="#lore-section" class="nav-menu-link">獵人體系</a>
+        <a href="#campaign-section" class="nav-menu-link">實戰戰役</a>
+        <a href="#features-section" class="nav-menu-link">系統面板</a>
+        <a href="#story-chronicle" class="nav-menu-link nav-highlight">史詩編年史</a>
+        <a href="#arise-quote-section" class="nav-menu-link">站起來！</a>
+        <a href="#shadow-army" class="nav-menu-link">暗影軍團</a>
+        <a href="#world-factions" class="nav-menu-link">兩大陣營</a>
+        <a href="#guild-allies" class="nav-menu-link">嘯牙公會</a>
+      </div>
+
+      <!-- Tech HUD Info bar showing reactive status -->
+      <div class="nav-hud-info">
+        <div class="hud-item">
+          <span class="hud-dot pulse"></span>
+          <span>SYSTEM ONLINE</span>
+        </div>
+        <div class="hud-item">
+          <span style="color: var(--color-outline);">RANK:</span>
+          <span id="hud-rank-val" style="color: var(--color-secondary); font-weight: bold;">E-RANK</span>
+        </div>
+        <div class="hud-item">
+          <span style="color: var(--color-outline);">LEVEL:</span>
+          <span id="hud-level-val" style="color: var(--color-primary); font-weight: bold;">1</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-background">
+      <img src="assets/portal.jpg" alt="Dungeon Gate Portal Background" class="hero-bg-img">
+    </div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="system-status-indicator">
+          【 系統覺醒狀態：暗影君王神格已載入 】
+        </div>
+        <h1 class="hero-title">我獨自升級<br><span style="font-size: 0.8em; letter-spacing: 2px;">SOLO LEVELING</span></h1>
+        <p class="hero-desc">
+          「世界已在魔物與門扉的衝擊下改變。弱肉強食是唯一的法則，唯有他打破了無法成長的宿命。從人類最弱兵器，到執掌數十萬不死亡者大軍，跨越無數次時光輪迴，獨自背負守護世界的終極神話。」
+        </p>
+        <div class="hero-actions">
+          <a href="#story-chronicle" class="btn btn-primary">📖 探索12大主線史詩編年史</a>
+          <a href="#arise-quote-section" class="btn btn-secondary">👑 呼喚暗影真言「站起來！」</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini notice HUD popup floating in corner -->
+    <div id="hud-notice-panel" class="floating-hud-notice">
+      <div class="hud-notice-header">
+        <span id="hud-notice-title-txt" class="hud-notice-title">【每日挑戰未完成】</span>
+        <button id="notice-close-btn" class="hud-notice-close">&times;</button>
+      </div>
+      <div id="hud-notice-content-txt" class="hud-notice-content">
+        您今日有一項日常訓練待結算。點擊 <a href="#" id="daily-quest-trigger" style="color: var(--color-primary); text-decoration: underline;">這裡</a> 進入任務面板結算 +5 屬性點！
+      </div>
+    </div>
+  </header>
+
+  <!-- Worldview & Ranks Section -->
+  <section id="lore-section" class="lore-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">世界觀與獵人體系</span>
+        <h2 class="section-title">傳送門與等級排行</h2>
+        <p class="body-md">
+          自從「門」開啟後，世界出現了覺醒超能力的「獵人」。獵人的等級從覺醒那一刻便被固定，無法更改——除了唯一能透過系統無限成長的特例。
+        </p>
+      </div>
+
+      <div class="rank-showcase-container">
+        <!-- Static selector buttons -->
+        <div class="rank-selector-row">
+          <button class="rank-btn rank-btn-s" data-rank="S">S</button>
+          <button class="rank-btn rank-btn-a" data-rank="A">A</button>
+          <button class="rank-btn rank-btn-b" data-rank="B">B</button>
+          <button class="rank-btn rank-btn-c" data-rank="C">C</button>
+          <button class="rank-btn rank-btn-d" data-rank="D">D</button>
+          <button class="rank-btn rank-btn-e active" data-rank="E">E</button>
+        </div>
+
+        <!-- Detail display glass card -->
+        <div class="glass-card glass-card-lg rank-detail-card">
+          <!-- Rank Icon badge representation -->
+          <div class="rank-display-badge">
+            <span id="badge-rank-letter" class="badge-rank-letter">E</span>
+            <span class="badge-label">Hunter Class</span>
+          </div>
+          
+          <!-- Rank Info texts -->
+          <div class="rank-info-content">
+            <h3 id="rank-title-text">人類最弱兵器 / E級</h3>
+            <p id="rank-desc-text" class="rank-info-desc">
+              最底層的覺醒者，魔力值僅略高於普通人類。哪怕是在最低階的「E級傳送門」中也隨時面臨生命危險，需要依靠超越常人的意志與智慧苟延殘喘。
+            </p>
+            <div class="rank-stats-grid">
+              <div class="rank-stat-box">
+                <div class="rank-stat-label">戰力係數</div>
+                <div id="rank-stat-str" class="rank-stat-val">12</div>
+              </div>
+              <div class="rank-stat-box">
+                <div class="rank-stat-label">魔力感應</div>
+                <div id="rank-stat-agi" class="rank-stat-val">15</div>
+              </div>
+              <div class="rank-stat-box">
+                <div class="rank-stat-label">存活概率</div>
+                <div id="rank-stat-vit" class="rank-stat-val">10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Awakening quiz banner -->
+        <div class="awakening-banner">
+          <div class="awakening-portal-ring"></div>
+          <h3 class="headline-md" style="margin-bottom: 12px; color: #ffffff;">命運的第二次覺醒試煉</h3>
+          <p class="body-md" style="max-width: 600px; margin: 0 auto 24px; color: var(--color-text-variant);">
+            魔力波測量儀已鎖定您的靈魂頻率。現在點擊，進行魔力值覺醒檢測，解鎖您的真實階級徽章！
+          </p>
+          <button id="awaken-assessment-btn" class="btn btn-primary">開始覺醒檢測</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Story Campaign Section -->
+  <section id="campaign-section" class="campaign-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">主線即時動作戰役</span>
+        <h2 class="section-title">系統戰役之境 · 實戰試煉</h2>
+        <p class="body-md">
+          「系統提示：進入地下城實戰關卡。親自操控成振宇，施展匕首連斬、瞬步殘影與暗影將軍合擊，突破生死絕境！」
+        </p>
+      </div>
+
+      <div class="grid-12">
+        <!-- Campaign list column (Spans 3 cols on large screen) -->
+        <div class="glass-card campaign-list-card" style="grid-column: span 3;">
+          <h3 class="headline-md" style="font-size: 17px; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">戰役目錄</h3>
+          <div class="campaign-list">
+            <!-- Act 1 -->
+            <div class="campaign-item active" data-act="1" id="campaign-item-1">
+              <span class="act-num">ACT 01</span>
+              <div class="act-details">
+                <div class="act-name">雙重地下城</div>
+                <div class="act-difficulty text-glow-blue" style="color: var(--color-primary);">E-Rank / 神殿死光</div>
+              </div>
+            </div>
+            <!-- Act 2 -->
+            <div class="campaign-item locked" data-act="2" id="campaign-item-2">
+              <span class="act-num">ACT 02</span>
+              <div class="act-details">
+                <div class="act-name">罰時沙丘與背叛之門</div>
+                <div class="act-difficulty">C-Rank / 沙蟲與處決</div>
+              </div>
+            </div>
+            <!-- Act 3 -->
+            <div class="campaign-item locked" data-act="3" id="campaign-item-3">
+              <span class="act-num">ACT 03</span>
+              <div class="act-details">
+                <div class="act-name">轉職挑戰：耶格利特</div>
+                <div class="act-difficulty">B-Rank / 血色大劍決鬥</div>
+              </div>
+            </div>
+            <!-- Act 4 -->
+            <div class="campaign-item locked" data-act="4" id="campaign-item-4">
+              <span class="act-num">ACT 04</span>
+              <div class="act-details">
+                <div class="act-name">濟州島：蟻王討伐戰</div>
+                <div class="act-difficulty">S-Rank / 天災決戰</div>
+              </div>
+            </div>
+            <!-- Act 5 -->
+            <div class="campaign-item locked" data-act="5" id="campaign-item-5">
+              <span class="act-num">ACT 05</span>
+              <div class="act-details">
+                <div class="act-name">我獨自返校：高校血戰</div>
+                <div class="act-difficulty">A-Rank / 救妹半獸人屠殺</div>
+              </div>
+            </div>
+            <!-- Act 6 -->
+            <div class="campaign-item locked" data-act="6" id="campaign-item-6">
+              <span class="act-num">ACT 06</span>
+              <div class="act-details">
+                <div class="act-name">獨自有特權：深海大屠殺</div>
+                <div class="act-difficulty">A-Rank / 魚人BOSS芝麻</div>
+              </div>
+            </div>
+            <!-- Act 7 -->
+            <div class="campaign-item locked" data-act="7" id="campaign-item-7">
+              <span class="act-num">ACT 07</span>
+              <div class="act-details">
+                <div class="act-name">獨自回原點：卡特農神廟</div>
+                <div class="act-difficulty">S-Rank / 建築師與暗影黑心</div>
+              </div>
+            </div>
+            <!-- Act 8 -->
+            <div class="campaign-item locked" data-act="8" id="campaign-item-8">
+              <span class="act-num">ACT 08</span>
+              <div class="act-details">
+                <div class="act-name">我獨自旅日：S級百米巨人</div>
+                <div class="act-difficulty">S-Rank / 太祖君王萊吉亞</div>
+              </div>
+            </div>
+            <!-- Act 9 -->
+            <div class="campaign-item locked" data-act="9" id="campaign-item-9">
+              <span class="act-num">ACT 09</span>
+              <div class="act-details">
+                <div class="act-name">我獨自旅美：清道夫公會之戰</div>
+                <div class="act-difficulty">國家級 / 暴打托馬斯·安德烈</div>
+              </div>
+            </div>
+            <!-- Act 10 -->
+            <div class="campaign-item locked" data-act="10" id="campaign-item-10">
+              <span class="act-num">ACT 10</span>
+              <div class="act-details">
+                <div class="act-name">我獨自扛戰：首爾三君王圍攻</div>
+                <div class="act-difficulty">君王級 / 百獸·酷寒·瘟疫</div>
+              </div>
+            </div>
+            <!-- Act 11 -->
+            <div class="campaign-item locked" data-act="11" id="campaign-item-11">
+              <span class="act-num">ACT 11</span>
+              <div class="act-details">
+                <div class="act-name">我獨自宣戰：加拿大龍帝決戰</div>
+                <div class="act-difficulty">龍帝級 / 破滅君王安塔利斯</div>
+              </div>
+            </div>
+            <!-- Act 12 -->
+            <div class="campaign-item locked" data-act="12" id="campaign-item-12">
+              <span class="act-num">ACT 12</span>
+              <div class="act-details">
+                <div class="act-name">我獨自成神：次元裂縫終極征伐</div>
+                <div class="act-difficulty text-glow-purple" style="color: var(--color-secondary);">真神級 / 孤身蕩平虛空神界</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hunter quick stats overview inside campaign card -->
+          <div class="campaign-hunter-mini-hud">
+            <div class="mini-hud-title">獵人當前戰鬥參數</div>
+            <div class="mini-hud-row"><span>力量 (STR):</span><span id="camp-str-val" class="glow-text-primary">10</span></div>
+            <div class="mini-hud-row"><span>敏捷 (AGI):</span><span id="camp-agi-val" class="glow-text-primary">10</span></div>
+            <div class="mini-hud-row"><span>體力 (VIT):</span><span id="camp-vit-val" class="glow-text-primary">10</span></div>
+            <div class="mini-hud-row"><span>智力 (INT):</span><span id="camp-int-val" class="glow-text-primary">10</span></div>
+            <div class="mini-hud-row"><span>感知 (SEN):</span><span id="camp-sen-val" class="glow-text-primary">10</span></div>
+            <a href="#features-section" class="btn btn-secondary btn-sm" style="margin-top: 10px; width: 100%; text-align: center;">提升屬性面板</a>
+          </div>
+        </div>
+
+        <!-- Campaign Playable Real-Time Action Console (Spans 9 cols) -->
+        <div class="glass-card campaign-console" id="campaign-console-panel" style="grid-column: span 9;">
+          <!-- Top game HUD status -->
+          <div class="console-hud-top">
+            <div class="console-player-hp">
+              <span class="console-lbl">HP</span>
+              <div class="console-bar-track hp-track"><div class="console-bar-fill hp-fill" id="combat-hp-fill" style="width: 100%;"></div></div>
+              <span class="console-val" id="combat-hp-val">100/100</span>
+            </div>
+            <div class="console-player-mp">
+              <span class="console-lbl">MP</span>
+              <div class="console-bar-track mp-track"><div class="console-bar-fill mp-fill" id="combat-mp-fill" style="width: 100%;"></div></div>
+              <span class="console-val" id="combat-mp-val">50/50</span>
+            </div>
+            <div class="console-mission-objective" id="combat-objective-badge">
+              <span class="hud-dot pulse"></span>
+              <span id="combat-objective-text">目標：消滅守門石侍並閃避猩紅死光 (0/4)</span>
+            </div>
+          </div>
+
+          <!-- Boss HUD status (Visible in combat) -->
+          <div class="console-hud-boss" id="boss-hud-panel" style="display: none;">
+            <div class="boss-info-row">
+              <span class="boss-name" id="boss-name-txt">BOSS: 猩紅巨神像</span>
+              <span class="boss-phase-tag" id="boss-phase-tag">PHASE 1</span>
+              <span class="boss-hp-val" id="boss-hp-val-txt">1000/1000</span>
+            </div>
+            <div class="console-bar-track boss-track">
+              <div class="console-bar-fill boss-fill" id="boss-hp-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Real-Time Combat Canvas Arena Container -->
+          <div class="combat-arena-wrapper" id="combat-arena-wrapper">
+            <canvas id="combat-canvas" width="800" height="420"></canvas>
+            
+            <!-- Combo & Combat floating stats overlay -->
+            <div class="combat-combo-counter" id="combat-combo-counter" style="display: none;">
+              <span class="combo-num" id="combo-num-txt">0</span>
+              <span class="combo-label">HITS</span>
+            </div>
+
+            <!-- Start / Story Cutscene Overlay Inside Arena -->
+            <div class="arena-story-overlay" id="arena-story-overlay">
+              <div class="arena-story-card">
+                <div class="story-badge-indicator">【 系統戰役指示 】</div>
+                <h3 class="arena-story-title" id="arena-act-title">ACT 01: 雙重地下城</h3>
+                <p class="arena-story-desc" id="arena-act-desc">
+                  神殿中央的巨神像雙眼發出毀滅性的猩紅光柱！無數魔裝石侍騎士揮舞長槍重劍圍殺而來。成振宇，握緊短刃，利用瞬步躲避死光，將敵人全數殲滅！
+                </p>
+                <div class="arena-control-guide">
+                  <span class="guide-item"><b>[WASD / 方向鍵]</b> 移動</span>
+                  <span class="guide-item"><b>[J / Space]</b> 匕首連斬</span>
+                  <span class="guide-item"><b>[K]</b> 殘影瞬步</span>
+                  <span class="guide-item"><b>[U]</b> 疾風突刺</span>
+                  <span class="guide-item"><b>[I]</b> 支配者之手</span>
+                  <span class="guide-item"><b>[O]</b> 起來吧 / 暗影軍團</span>
+                </div>
+                <button class="btn btn-primary btn-lg" id="arena-start-battle-btn" style="margin-top: 16px; width: 220px;">
+                  ⚔️ 開始實戰進入
+                </button>
+              </div>
+            </div>
+
+            <!-- Victory / Defeat Overlay Inside Arena -->
+            <div class="arena-result-overlay" id="arena-result-overlay" style="display: none;">
+              <div class="arena-result-card" id="arena-result-card">
+                <div class="result-title" id="arena-result-title">VICTORY</div>
+                <div class="result-subtitle" id="arena-result-subtitle">戰役通關！成功擊破強敵！</div>
+                <div class="result-rewards" id="arena-result-rewards">
+                  <div class="reward-row"><span>獲得經驗值:</span><span class="glow-text-primary">+1500 EXP</span></div>
+                  <div class="reward-row"><span>獲得屬性點數:</span><span class="glow-text-primary">+5 PTS</span></div>
+                  <div class="reward-row"><span>暗影士兵提取:</span><span class="glow-text-purple">可提取</span></div>
+                </div>
+                <div class="result-btn-row">
+                  <button class="btn btn-primary" id="arena-result-next-btn">確認獎勵 / 前往下一幕</button>
+                  <button class="btn btn-secondary" id="arena-result-replay-btn">重新挑戰此關</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons / Touch Controls Panel -->
+          <div class="combat-controls-panel">
+            <div class="combat-key-shortcuts">
+              <span class="key-tag"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動</span>
+              <span class="key-tag"><kbd>J</kbd> 普攻連斬</span>
+              <span class="key-tag"><kbd>K</kbd> 瞬步 (無敵幀)</span>
+              <span class="key-tag"><kbd>U</kbd> 疾影突刺 [10MP]</span>
+              <span class="key-tag"><kbd>I</kbd> 支配者之手 [20MP]</span>
+              <span class="key-tag"><kbd>O</kbd> 暗影軍團/奧義 [35MP]</span>
+            </div>
+
+            <!-- Mobile & Touch Interactive Virtual Buttons -->
+            <div class="virtual-actions-bar">
+              <button class="v-btn v-btn-attack" id="v-btn-attack" title="匕首普攻">
+                <span class="v-btn-icon">⚔️</span>
+                <span class="v-btn-text">普攻 [J]</span>
+              </button>
+              <button class="v-btn v-btn-dash" id="v-btn-dash" title="瞬步閃避">
+                <span class="v-btn-icon">⚡</span>
+                <span class="v-btn-text">瞬步 [K]</span>
+              </button>
+              <button class="v-btn v-btn-skill1" id="v-btn-skill1" title="疾影突刺 (10 MP)">
+                <span class="v-btn-icon">🗡️</span>
+                <span class="v-btn-text">突刺 [U]</span>
+                <span class="v-cd-overlay" id="v-cd-skill1"></span>
+              </button>
+              <button class="v-btn v-btn-skill2" id="v-btn-skill2" title="支配者之手 (20 MP)">
+                <span class="v-btn-icon">🖐️</span>
+                <span class="v-btn-text">支配 [I]</span>
+                <span class="v-cd-overlay" id="v-cd-skill2"></span>
+              </button>
+              <button class="v-btn v-btn-ult" id="v-btn-ult" title="暗影軍團奧義 (35 MP)">
+                <span class="v-btn-icon">👑</span>
+                <span class="v-btn-text">起來吧 [O]</span>
+                <span class="v-cd-overlay" id="v-cd-ult"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Combat Live Combat Log Banner -->
+          <div class="combat-mini-log" id="combat-mini-log">
+            <span class="log-indicator">【系統戰況】</span>
+            <span id="combat-mini-log-text">成振宇已就位。請點擊「開始實戰進入」或按下普攻開始戰鬥。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features / Stats simulator Grid -->
+  <section id="features-section" class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">獵人系統面板</span>
+        <h2 class="section-title">唯一能成長的獵人</h2>
+        <p class="body-md">
+          「系統加持」打破了覺醒級別無法變動的鐵律。你可以像遊戲角色一樣，通過完成每日任務積累點數，任意分配屬性。
+        </p>
+      </div>
+
+      <div class="grid-12">
+        <!-- Sung Jin-Woo stats HUD panel (Spans 5 cols) -->
+        <div class="glass-card stats-hud">
+          <div class="stats-hud-header">
+            <div>
+              <div class="stats-hud-level">LV. <span id="stats-level-num">1</span></div>
+              <div class="stats-hud-job">職業：暗影君王 (預備)</div>
+            </div>
+            <span class="chip chip-danger">不可限量</span>
+          </div>
+
+          <!-- Mana Bar representation -->
+          <div class="mana-bar-container">
+            <div class="mana-bar-label">
+              <span>MANA (魔力值)</span>
+              <span>1,250 / 1,500</span>
+            </div>
+            <div class="mana-bar-track">
+              <div class="mana-bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- Interactive stats modifier rows -->
+          <div class="stats-rows">
+            <!-- Strength Row -->
+            <div class="stat-row">
+              <span class="stat-name">力量 (STR)</span>
+              <span id="stat-val-str" class="stat-val">10</span>
+              <div class="stat-progress-track">
+                <div id="stat-fill-str" class="stat-progress-fill" style="width: 20%;"></div>
+              </div>
+              <button class="stat-btn-plus" data-stat="str">+</button>
+            </div>
+            
+            <!-- Agility Row -->
+            <div class="stat-row">
+              <span class="stat-name">敏捷 (AGI)</span>
+              <span id="stat-val-agi" class="stat-val">10</span>
+              <div class="stat-progress-track">
+                <div id="stat-fill-agi" class="stat-progress-fill" style="width: 20%;"></div>
+              </div>
+              <button class="stat-btn-plus" data-stat="agi">+</button>
+            </div>
+
+            <!-- Vitality Row -->
+            <div class="stat-row">
+              <span class="stat-name">體力 (VIT)</span>
+              <span id="stat-val-vit" class="stat-val">10</span>
+              <div class="stat-progress-track">
+                <div id="stat-fill-vit" class="stat-progress-fill" style="width: 20%;"></div>
+              </div>
+              <button class="stat-btn-plus" data-stat="vit">+</button>
+            </div>
+
+            <!-- Intelligence Row -->
+            <div class="stat-row">
+              <span class="stat-name">智力 (INT)</span>
+              <span id="stat-val-int" class="stat-val">10</span>
+              <div class="stat-progress-track">
+                <div id="stat-fill-int" class="stat-progress-fill" style="width: 20%;"></div>
+              </div>
+              <button class="stat-btn-plus" data-stat="int">+</button>
+            </div>
+
+            <!-- Sense Row -->
+            <div class="stat-row">
+              <span class="stat-name">感知 (SEN)</span>
+              <span id="stat-val-sen" class="stat-val">10</span>
+              <div class="stat-progress-track">
+                <div id="stat-fill-sen" class="stat-progress-fill" style="width: 20%;"></div>
+              </div>
+              <button class="stat-btn-plus" data-stat="sen">+</button>
+            </div>
+          </div>
+
+          <!-- Bottom controls -->
+          <div class="stat-points-remaining" style="margin-bottom: 20px;">
+            未分配屬性點數：<span id="stat-points-val" class="glow-text-primary" style="font-weight: bold;">10</span>
+            <div style="font-size: 11px; color: var(--color-outline); margin-top: 4px;">⚡ 提示：點擊或按住「+」號可連續快速加點</div>
+          </div>
+
+          <button id="stat-confirm-btn" class="btn btn-secondary" style="width: 100%;" disabled>確認分配 / LEVEL UP</button>
+        </div>
+
+        <!-- System feature highlights descriptions (Spans 7 cols) -->
+        <div class="features-side">
+          <!-- Feature panel 1 -->
+          <div class="glass-card feature-panel">
+            <div class="feature-icon-wrapper">
+              <!-- SVG Icon representation -->
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div>
+              <h3 class="feature-panel-title">獨一無二的無限成長系統</h3>
+              <p class="feature-panel-desc">
+                在普通獵人的覺醒上限已經固定的世界，您是唯一被「系統」選中並能持續升級的特例。每次升級都會重塑您的體質與肉體強度。
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature panel 2 -->
+          <div class="glass-card feature-panel">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <h3 class="feature-panel-title">暗影支配與士兵提取</h3>
+              <p class="feature-panel-desc">
+                擊敗地下城高階魔獸後，您可以使用亡靈技能「提取影子」，將對方的靈魂收為您的不滅暗影部屬。影子士兵將隨著君王共同升級。
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature panel 3 -->
+          <div class="glass-card feature-panel">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/></svg>
+            </div>
+            <div>
+              <h3 class="feature-panel-title">神話兵器與符石技能</h3>
+              <p class="feature-panel-desc">
+                通過深淵關卡獲取頂尖匕首、短劍與龍牙兵刃，鑲嵌地下城符文之石獲得破甲、雷擊及隱形等神級主被動技能。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- 🎬 THE GRAND SAGA: FULL STORY RECAP BREAKDOWN -->
+  <!-- =================================================== -->
+  <section id="saga-overview" class="saga-overview-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" style="color: var(--color-secondary);">完結篇全主線史詩劇情解說大合集</span>
+        <h2 class="section-title">《我獨自升級》從最弱兵器到孤獨成神</h2>
+        <p class="body-md">
+          「10年前，世界與其他次元連接的『門』被打開，各種魔物不斷湧現，能力各異的獵魔者隨之覺醒，被稱為『獵人』。程肖宇（成振宇）本是實力最弱的E級獵人，卻在雙重地下城瀕死之際獲得唯獨他可見的升級系統，開啟了弒神成王、輪迴逆轉的浩瀚神話！」
+        </p>
+      </div>
+
+      <!-- Grand Story Overview 4 Major Eras Showcase -->
+      <div class="saga-eras-grid">
+        <!-- Era 1 -->
+        <div class="glass-card saga-era-card">
+          <div class="saga-era-header">
+            <span class="saga-era-badge era-badge-blue">PHASE 01</span>
+            <h3 class="saga-era-title">神殿覺醒 · 公會創立與蟻王天災</h3>
+          </div>
+          <p class="saga-era-desc">
+            全隊踏入雙重地下城被石侍與巨神像當菜砍，主角參透三大戒律於祭壇死中覺醒，成為唯一能打破成長極限的玩家。在罰時沙漠狂奔練就鋼鐵身軀，反殺背叛隊長黃東石。創立公會原本取名『單身公會』被劉晨浩吐槽改名『嘯牙 (Ahjin)』，S級車海印臉紅求入會，晨浩名媛表姊劉蘇嫻湊齊三人。隨後濟州島空降暴打天災蟻王，提取真名『貝爾』！
+          </p>
+          <div class="saga-era-footer">
+            <span class="saga-tag">⚡ 卡特農死中覺醒</span>
+            <span class="saga-tag">🐺 嘯牙公會成立</span>
+            <span class="saga-tag">🐜 蟻王貝爾提取</span>
+          </div>
+        </div>
+
+        <!-- Era 2 -->
+        <div class="glass-card saga-era-card">
+          <div class="saga-era-header">
+            <span class="saga-era-badge era-badge-purple">PHASE 02</span>
+            <h3 class="saga-era-title">高校救妹 · 協會特權與吞噬系統</h3>
+          </div>
+          <p class="saga-era-desc">
+            妹妹高中美術室突發紅門獸人屠戮，主角瞬步撕裂空間破空救妹，留在地下城的影之螞蟻僅憑自身就將高階怪物全滅！獲得協會會長高建利破例授予的『單人高級地下城攻略特權』展開深海大屠殺收服雙叉戟『芝麻』。手持漆黑未知鑰匙重回卡特農神廟，體內長出第二顆暗影黑心臟搞出系統Bug反噬吞噬系統，將邪神巨像與設計者建築師徹底斬滅！
+          </p>
+          <div class="saga-era-footer">
+            <span class="saga-tag">🏫 瞬步破空救妹</span>
+            <span class="saga-tag">🔱 深海芝麻收服</span>
+            <span class="saga-tag">🖤 雙心臟吞噬系統</span>
+          </div>
+        </div>
+
+        <!-- Era 3 -->
+        <div class="glass-card saga-era-card">
+          <div class="saga-era-header">
+            <span class="saga-era-badge era-badge-gold">PHASE 03</span>
+            <h3 class="saga-era-title">跨國遠征 · 滅殺始祖與暴打托馬斯</h3>
+          </div>
+          <p class="saga-era-desc">
+            日本S級傳送門百米巨人肆虐，主角隻身赴日拯救日本滅殺被鎖鏈禁錮的始祖巨人『太祖萊吉亞』。受邀赴美參加國際獵人峰會，叛徒黃東樹綁架虐待劉晨浩找死，世界最強國家級獵人托馬斯·安德烈親自保人，被主角按在地上瘋狂摩擦暴打！主角當場處決黃東樹提取為『無厭 (Greed)』，托馬斯心悅誠服贈予巨龍尖牙神器『卡米什的狂怒』雙短劍！
+          </p>
+          <div class="saga-era-footer">
+            <span class="saga-tag">⛓️ 斬滅太祖萊吉亞</span>
+            <span class="saga-tag">👊 摩擦國家級托馬斯</span>
+            <span class="saga-tag">🗡️ 卡米什的狂怒獲贈</span>
+          </div>
+        </div>
+
+        <!-- Era 4 -->
+        <div class="glass-card saga-era-card">
+          <div class="saga-era-header">
+            <span class="saga-era-badge era-badge-cyan">PHASE 04</span>
+            <h3 class="saga-era-title">阿斯木歷史課 · 龍帝神罰與倒轉十年</h3>
+          </div>
+          <p class="saga-era-desc">
+            摩天輪約會後火速馳援戰場獨戰三大君王怒斬瘟疫，心臟被穿假死於病房幻象甦醒，初代君王阿斯木親自上歷史課講述創世神絕對者與輪迴之盃倒轉秘辛，真王以人類肉身完全覺醒，父親程日翰動用神力後化灰消散。首爾黑門開啟阿斯木數十萬原始大軍齊刷刷下跪迎王，收服總軍團長伯利昂。破滅龍帝加拿大調虎離山，主角結合支配者神罰長槍徹底轟殺龍帝！最終啟動輪迴之盃倒轉十年，於次元裂縫苦戰27年斬盡君王，締造世人無人知曉其名的和平世界！
+          </p>
+          <div class="saga-era-footer">
+            <span class="saga-tag">📖 阿斯木創世歷史課</span>
+            <span class="saga-tag">👑 數十萬大軍下跪</span>
+            <span class="saga-tag">⏳ 輪迴十年孤獨成神</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- 🌟 1. STORY CHRONICLE: 12 EPIC STORY ARCS (NEW) -->
+  <!-- =================================================== -->
+  <section id="story-chronicle" class="story-chronicle-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" style="color: var(--color-primary);">全主線史詩編年史</span>
+        <h2 class="section-title">暗影君王降臨錄 · 12大傳奇篇章</h2>
+        <p class="body-md">
+          從被視為最卑微的「人類最弱兵器」，到創立嘯牙公會、屠戮深淵、斬殺太祖君王、擊潰國家級獵人，乃至在次元裂縫中獨自成神。完整見證成振宇登頂宇宙王座的宿命歷程！
+        </p>
+      </div>
+
+      <!-- Chronicle Filter Tabs -->
+      <div class="chronicle-filter-row">
+        <button class="chronicle-filter-btn active" data-filter="all">全 12 章節</button>
+        <button class="chronicle-filter-btn" data-filter="rising">君王崛起 (01-04)</button>
+        <button class="chronicle-filter-btn" data-filter="abyss">深淵原點與跨國 (05-08)</button>
+        <button class="chronicle-filter-btn" data-filter="godhood">君王神戰與輪迴 (09-12)</button>
+      </div>
+
+      <!-- 12 Chapters Interactive Timeline Grid -->
+      <div class="chronicle-grid">
+
+        <!-- Chapter 01 -->
+        <article class="glass-card chronicle-card" data-category="rising" data-chapter="1">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 01</span>
+            <span class="chronicle-tag tag-gold">預言之王 · 無極限</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自成王</h3>
+          <div class="chronicle-card-quote">
+            「他不是普通的獵人……他是真正的王，而且他的力量——根本沒有極限！」
+          </div>
+          <p class="chronicle-card-desc">
+            在美國最高級別預言家賽諾夫人（諾瑪·賽諾）的占卜中，世間所有強者的潛力都有著清晰的天花板。唯獨在看透成振宇的靈魂時，她看見了無窮無盡的深淵與君王神格，親口承認他就是超越常理的唯一真王！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">👑 賽諾夫人神級認證</span>
+            <span class="chronicle-badge">🌌 無極限成長</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="1">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="1">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 02 -->
+        <article class="glass-card chronicle-card" data-category="rising" data-chapter="2">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 02</span>
+            <span class="chronicle-tag tag-blue">嘯牙公會 · 車車入會</span>
+          </div>
+          <h3 class="chronicle-card-title">獨自當會長</h3>
+          <div class="chronicle-card-quote">
+            「原本想叫單身公會太難聽，改名嘯牙 (Ahjin)……車車滿臉想入會，表姊劉蘇嫻也來了！」
+          </div>
+          <p class="chronicle-card-desc">
+            為了獲得自由攻略高級傳送門的特權，成振宇決定自創公會。起初取名『單身公會』被富二代劉晨浩吐槽，最終更名為『嘯牙公會』。S級女獵人車海印聞訊前來考核一臉想入會，劉晨浩的名媛表姊劉蘇嫻也順利加入湊齊三人門檻！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🐺 嘯牙公會創立</span>
+            <span class="chronicle-badge">😳 車海印臉紅求入會</span>
+            <span class="chronicle-badge">💼 表姊劉蘇嫻加入</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="2">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="2">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 03 -->
+        <article class="glass-card chronicle-card" data-category="rising" data-chapter="3">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 03</span>
+            <span class="chronicle-tag tag-purple">高校血洗 · 影蟻屠戮</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自返校</h3>
+          <div class="chronicle-card-quote">
+            「動我妹妹者死！瞬步撕裂長空回援，留在地下城的暗影螞蟻已將怪物全滅！」
+          </div>
+          <p class="chronicle-card-desc">
+            妹妹成珍雅的高中美術室突發高階紅色傳送門，嗜血獸人魔物血洗校園。正在攻略遠方地下城的成振宇感應到妹妹影中的暗影護衛警報，立刻拋下眼前地下城以極速瞬步破空趕到妹妹面前！而他留在地下城的影子士兵螞蟻，僅憑自身就將地下城魔物全數虐殺殆盡！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🏫 學校美術室紅門</span>
+            <span class="chronicle-badge">⚡ 瞬步撕裂空間救妹</span>
+            <span class="chronicle-badge">🐜 暗影螞蟻全滅怪物</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="5">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="3">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 04 -->
+        <article class="glass-card chronicle-card" data-category="rising" data-chapter="4">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 04</span>
+            <span class="chronicle-tag tag-cyan">協會特權 · 屠殺清剿</span>
+          </div>
+          <h3 class="chronicle-card-title">獨自有特權</h3>
+          <div class="chronicle-card-quote">
+            「得到獵人協會一人攻略高級地下城的特權，單人展開大屠殺，收服BOSS魚人芝麻！」
+          </div>
+          <p class="chronicle-card-desc">
+            獵人協會會長高建利深知成振宇的驚世戰力，破例授予他前所未有的「單人攻略高級傳送門特權」。成振宇自此展開瘋狂的單人刷本升級大屠殺，並在深海高難地下城中力克雙叉戟兇暴魚人首領，將其收服為影之突擊隊長——「芝麻 (Jima)」！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">📜 協會一人攻略特權</span>
+            <span class="chronicle-badge">⚔️ 地下城大屠殺</span>
+            <span class="chronicle-badge">🔱 提取BOSS魚人芝麻</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="6">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="4">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 05 -->
+        <article class="glass-card chronicle-card" data-category="abyss" data-chapter="5">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 05</span>
+            <span class="chronicle-tag tag-purple">漆黑鑰匙 · 吞噬系統</span>
+          </div>
+          <h3 class="chronicle-card-title">獨自回原點</h3>
+          <div class="chronicle-card-quote">
+            「體內長出第二顆暗影黑心臟，引發系統Bug反噬吞噬系統，滅了邪神與系統設計者！」
+          </div>
+          <p class="chronicle-card-desc">
+            成振宇手持漆黑的未知鑰匙，重回宿命的起點——卡特農神廟（雙重地下城）。系統設計者（神像建築師）試圖將主角當作暗影君王降臨的容器，卻驚愕發現主角體內不知何時孕育了第二顆「暗影心臟」，導致系統產生Bug被反向吞噬！成振宇揮刃將邪神巨像與設計者徹底斬殺！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🗝️ 漆黑未知鑰匙</span>
+            <span class="chronicle-badge">🖤 雙心臟吞噬系統Bug</span>
+            <span class="chronicle-badge">🗿 斬殺邪神與建築師</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="7">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="5">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 06 -->
+        <article class="glass-card chronicle-card" data-category="abyss" data-chapter="6">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 06</span>
+            <span class="chronicle-tag tag-gold">跨海救日 · 始祖君王</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自旅日</h3>
+          <div class="chronicle-card-quote">
+            「日本國內力量全滅無法抵擋S級危機，主角一人拯救日本，進入傳送口滅太祖君王萊吉亞！」
+          </div>
+          <p class="chronicle-card-desc">
+            日本東京上空爆發S級超巨型傳送門，百米巨人魔物肆虐，日本頂尖獵人全軍覆沒。成振宇單槍匹馬跨海赴日，隻身屠滅巨人軍團。深入傳送門核心後，他拒絕被利誘，一刀斬殺被鎖鏈禁錮的「始祖巨人君王·太祖萊吉亞」，並得知了九大君王與光明支配者永恆對立的創世秘辛！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🗾 單人拯救日本免於滅頂</span>
+            <span class="chronicle-badge">⛓️ 斬滅太祖君王萊吉亞</span>
+            <span class="chronicle-badge">🌌 揭秘九大君王資訊</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="8">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="6">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 07 -->
+        <article class="glass-card chronicle-card" data-category="abyss" data-chapter="7">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 07</span>
+            <span class="chronicle-tag tag-blue">國際峰會 · 暴打托馬斯</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自旅美</h3>
+          <div class="chronicle-card-quote">
+            「晨浩遭綁架，主角幹上清道夫公會托馬斯把世界最強按在地上摩擦，收服黃東樹為『無厭』！」
+          </div>
+          <p class="chronicle-card-desc">
+            成振宇受邀赴美參加國際獵人會議，參觀第一巨龍「卡米什」骸骨。叛逃S級獵人黃東樹趁機綁架凌虐富二代劉晨浩，成振宇暴怒降臨，世界頂尖「清道夫公會」國家級獵人托馬斯·安德烈親自出面阻攔。成振宇隻手將不可一世的世界最強托馬斯按在地上瘋狂摩擦，並處決黃東樹提取為影之將軍——「無厭 (Greed)」！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🐉 參觀巨龍卡米什殘骸</span>
+            <span class="chronicle-badge">👊 暴打國家級托馬斯</span>
+            <span class="chronicle-badge">👑 提取S級黃東樹為無厭</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="9">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="7">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 08 -->
+        <article class="glass-card chronicle-card" data-category="abyss" data-chapter="8">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 08</span>
+            <span class="chronicle-tag tag-purple">會長殞落 · 獨戰三君王</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自扛戰</h3>
+          <div class="chronicle-card-quote">
+            「高建利會長光輝碎片殞落，托馬斯贈刀；遊樂園約會救場，主角一人獨扛三大君王斬瘟疫！」
+          </div>
+          <p class="chronicle-card-desc">
+            身懷「最璀璨光輝碎片」的獵人協會會長高建利遭酷寒君王刺殺殞落。被主角打服的托馬斯前來致敬，將巨龍之牙神器「卡米什短劍」贈予主角。隨後百獸君王突襲，此時成振宇正與車車在遊樂園約會，托馬斯苦撐不敵，主角及時趕到隻身扛起戰局，面對百獸、酷寒、瘟疫三大君王圍毆，絕境中怒斬瘟疫君王！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🕊️ 高建利光輝碎片殞落</span>
+            <span class="chronicle-badge">🗡️ 獲贈卡米什短劍</span>
+            <span class="chronicle-badge">🎡 遊樂園約會後獨扛三大君王</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="10">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="8">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 09 -->
+        <article class="glass-card chronicle-card" data-category="godhood" data-chapter="9">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 09</span>
+            <span class="chronicle-tag tag-gold">假死覺醒 · 真王降臨</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自輪迴</h3>
+          <div class="chronicle-card-quote">
+            「心臟被捅假死，阿斯木上歷史課講述支配者與君王由來、輪迴之盃倒轉無數次！完整神力復甦！」
+          </div>
+          <p class="chronicle-card-desc">
+            主角被百獸君王刺穿心臟假死，於病房無限幻象中甦醒。初代暗影君王阿斯木現身上歷史課：創世神「絕對者」創造光明碎片（支配者）與黑暗碎片（君王）永恆廝殺；地球早已被當戰場毀滅過無數次，全靠支配者使用『輪迴之盃』倒轉時光！阿斯木將全部神力託付主角，真王復甦重回人間；父親程日翰動用光明碎片神力最後道別後化灰消散……
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">💔 心臟捅刀與病房無限幻象</span>
+            <span class="chronicle-badge">📖 阿斯木創世神戰歷史課</span>
+            <span class="chronicle-badge">⏳ 輪迴之盃倒轉地球無數次毀滅</span>
+            <span class="chronicle-badge">🌅 父親程日翰灰飛煙滅</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="3">⚔️ 轉職與覺醒</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="9">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 10 -->
+        <article class="glass-card chronicle-card" data-category="godhood" data-chapter="10">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 10</span>
+            <span class="chronicle-tag tag-purple">原始軍團 · 總軍團長</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自大軍</h3>
+          <div class="chronicle-card-quote">
+            「首爾最大傳送門開啟，冒出的竟是前任君王阿斯木數十萬原始大軍！收服總軍團長伯利昂！」
+          </div>
+          <p class="chronicle-card-desc">
+            韓國上空浮現超巨型黑色傳送門，全世界陷入絕望。然而從門扉中踏出的，竟是初代暗影君王阿斯木沉睡的原始軍團——整整數十萬名身經百戰的不死暗影大軍！全軍見到成振宇齊齊下跪高呼吾王！統領這支浩瀚大軍的，正是手握千節蜈蚣長劍的影之總軍團長「伯利昂 (Bellion)」，主角瞬間執掌宇宙最強軍勢！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🌌 韓國最大傳送門降臨</span>
+            <span class="chronicle-badge">👥 數十萬原始暗影士兵歸附</span>
+            <span class="chronicle-badge">⚔️ 收服總軍團長伯利昂</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="4">⚔️ 召喚大軍實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="10">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 11 -->
+        <article class="glass-card chronicle-card" data-category="godhood" data-chapter="11">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 11</span>
+            <span class="chronicle-tag tag-gold">八門滅世 · 斬殺龍帝</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自宣戰</h3>
+          <div class="chronicle-card-quote">
+            「全球8大傳送口蠢蠢欲動，破滅君王龍帝加拿大降臨！滅幻界、金剛君王，結合支配者神罰打敗龍帝！」
+          </div>
+          <p class="chronicle-card-desc">
+            地球上空8個巨型傳送口即將破滅，成振宇通告全球人類遠離撤離。主角奔赴中國防守卻遇敵方「調虎離山空城計」，邪惡最強「破滅君王·龍帝安塔利斯」於加拿大降臨大肆破壞！成振宇急速折返，斬殺幻界君王與金剛君王，最後結合支配者們神罰光矛徹底擊潰破滅君王龍帝！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">🌍 全球8大傳送口末日降臨</span>
+            <span class="chronicle-badge">🎭 龍帝調虎離山空城計</span>
+            <span class="chronicle-badge">🐉 滅幻界/金剛君王</span>
+            <span class="chronicle-badge">⚡ 結合支配者神罰斬滅龍帝</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="11">⚔️ 進入實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="11">📖 回憶錄</button>
+          </div>
+        </article>
+
+        <!-- Chapter 12 -->
+        <article class="glass-card chronicle-card" data-category="godhood" data-chapter="12">
+          <div class="chronicle-card-top">
+            <span class="chronicle-index">ARC 12</span>
+            <span class="chronicle-tag tag-cyan">逆轉十年 · 孤獨成神</span>
+          </div>
+          <h3 class="chronicle-card-title">我獨自成神</h3>
+          <div class="chronicle-card-quote">
+            「要求重啟輪迴之盃倒轉十年，於次元裂縫孤身奮戰打敗所有君王！創造無人知曉的和平世界，極致首尾呼應『獨自』！」
+          </div>
+          <p class="chronicle-card-desc">
+            主角對人間滿目瘡痍的結局不滿意，要求支配者啟動『輪迴之盃』讓時光倒轉十年。成振宇孤身一人踏入次元裂縫歷經27年苦戰，將所有君王逐一斬草除根，締造了一個沒有傷亡、沒有魔力與獵人的安寧地球。雖然他是世界最強、獨自守護了全人類，但世上無人知曉他的名字，首尾呼應將『獨自』的悲壯宿命推向神話巔峰！
+          </p>
+          <div class="chronicle-meta-row">
+            <span class="chronicle-badge">⏳ 輪迴之盃倒轉十年</span>
+            <span class="chronicle-badge">🌌 次元裂縫孤身征伐諸君王</span>
+            <span class="chronicle-badge">🕊️ 締造無魔力和平地球</span>
+            <span class="chronicle-badge">👑 無人知曉的孤獨成神，極致『獨自』</span>
+          </div>
+          <div class="chronicle-actions-row">
+            <button class="btn btn-primary btn-sm chronicle-play-btn" data-act="12">⚔️ 進入終局實戰</button>
+            <button class="btn btn-secondary btn-sm chronicle-detail-btn" data-chapter="12">📖 回憶錄</button>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- 🌟 2. ICONIC QUOTE: "ARISE" (站起來！) SHOWCASE (NEW) -->
+  <!-- =================================================== -->
+  <section id="arise-quote-section" class="arise-quote-section">
+    <div class="container">
+      <div class="arise-quote-hero-box">
+        <div class="quote-ambient-vortex"></div>
+        <div class="arise-crown-icon">👑</div>
+        <span class="section-subtitle text-glow-purple">主角說過最多次的一句話 · 執掌生死的敕令</span>
+        <h2 class="arise-giant-text">『站起來！』</h2>
+        <h3 class="arise-en-sub">ARISE · 일어나라</h3>
+        <p class="arise-manifesto-desc">
+          「在死神的權柄之下，死亡不再是靈魂的終點，而是絕對忠誠的開端。每一次君王的低語，都伴隨著黑霧沖天與天崩地裂的誓言。」
+        </p>
+
+        <!-- Dynamic Arise Sound & FX Action Trigger -->
+        <button id="mega-arise-btn" class="btn btn-primary btn-lg mega-arise-action-btn">
+          ⚡ 釋放暗影真言 · 站起來！ (ARISE)
+        </button>
+
+        <!-- Quote Moments Grid -->
+        <div class="arise-moments-grid">
+          <div class="moment-card">
+            <div class="moment-target">⚔️ 血色劍聖 · 耶格利特</div>
+            <div class="moment-context">深淵王座轉職神殿三次呼喚，忠誠騎士跪拜臣服</div>
+            <div class="moment-quote">「你的忠誠與榮譽，將在我的暗影中永生——站起來！」</div>
+          </div>
+          <div class="moment-target-sep"></div>
+          <div class="moment-card">
+            <div class="moment-target">👑 天災魔王 · 蟻王貝爾</div>
+            <div class="moment-context">濟州島天災斬首，撕裂嗜血魔王意志化為第一戰將</div>
+            <div class="moment-quote">「向你的新王獻上靈魂與毒牙——站起來！」</div>
+          </div>
+          <div class="moment-target-sep"></div>
+          <div class="moment-card">
+            <div class="moment-target">🔱 深海霸主 · 芝麻 (Jima)</div>
+            <div class="moment-context">高階深海傳送門大屠殺，提取巨型雙叉戟魚人首領</div>
+            <div class="moment-quote">「揮舞你的三叉戟，為暗影開道——站起來！」</div>
+          </div>
+          <div class="moment-target-sep"></div>
+          <div class="moment-card">
+            <div class="moment-target">💀 叛逃狂徒 · 無厭 (黃東樹)</div>
+            <div class="moment-context">暴打世界最強托馬斯後處決黃東樹，提取為影之將軍</div>
+            <div class="moment-quote">「將你的狂暴與貪婪化為我的利刃——站起來！」</div>
+          </div>
+          <div class="moment-target-sep"></div>
+          <div class="moment-card">
+            <div class="moment-target">🌌 總軍團長 · 伯利昂與數十萬大軍</div>
+            <div class="moment-context">首爾超巨型傳送門開啟，初代暗影軍團全軍認主</div>
+            <div class="moment-quote">「數十萬沉睡的暗影軍團，隨我征伐神魔——站起來！」</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- 🌟 3. EXPANDED SHADOW ARMY ROSTER -->
+  <!-- =================================================== -->
+  <section id="shadow-army" class="shadow-army-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" style="color: var(--color-primary);">影之降領軍團</span>
+        <h2 class="section-title">亡者之兵，供我差遣</h2>
+        <p class="body-md">
+          在暗影君王的掌控中，殺戮只是服從的開始。從雙叉戟魚人芝麻、狂暴將軍無厭，到總軍團長伯利昂與數十萬原始大軍，誓死為君王而戰！
+        </p>
+      </div>
+
+      <!-- Soldier list Grid -->
+      <div class="grid-12 shadow-soldier-grid">
+        
+        <!-- Soldier card 1 (Bellion) - Grand Marshal -->
+        <div class="glass-card soldier-card grand-marshal-card" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: #ffd700;">👑</span>
+          </div>
+          <h3 class="soldier-name">伯利昂 (Bellion)</h3>
+          <div class="soldier-class">階級：影之總軍團長 (Grand Marshal)</div>
+          <p class="soldier-desc">
+            初代暗影君王阿斯木座下第一戰神。背生巨大雙翼，手握千節蜈蚣巨劍，統帥數十萬原始暗影軍團，戰力冠絕全軍！
+          </p>
+        </div>
+
+        <!-- Soldier card 2 (Igrit) -->
+        <div class="glass-card soldier-card" id="soldier-card-igrit" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: var(--color-primary-dim);">⚔️</span>
+          </div>
+          <h3 class="soldier-name">耶格利特 (Igrit)</h3>
+          <div class="soldier-class">階級：影之將軍 (General)</div>
+          <p class="soldier-desc">
+            前血色指揮官，忠誠與榮譽的化身。精通雙手大劍與雷電神速斬擊，永遠第一個單膝下跪聽候君王敕令。
+          </p>
+        </div>
+
+        <!-- Soldier card 3 (Beru) -->
+        <div class="glass-card soldier-card" id="soldier-card-beru" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: var(--color-secondary);">👑</span>
+          </div>
+          <h3 class="soldier-name">貝爾 (Beru)</h3>
+          <div class="soldier-class">階級：影之將軍 (General)</div>
+          <p class="soldier-desc">
+            濟州島天災蟻王，撕裂雙爪與超音波尖嘯的天花板級破壞力。性格傲嬌卻極度敬仰君王，喜好觀看肥皂劇學習人類語言。
+          </p>
+        </div>
+
+        <!-- Soldier card 4 (Greed / Hwang Dong-Soo) -->
+        <div class="glass-card soldier-card" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: #ff5555;">💀</span>
+          </div>
+          <h3 class="soldier-name">無厭 (Greed / 貪食)</h3>
+          <div class="soldier-class">階級：影之將軍 (原S級黃東樹)</div>
+          <p class="soldier-desc">
+            於美國峰會折磨劉晨浩後被成振宇處決提取。身軀籠罩血煞黑焰，近身肉搏狂暴兇殘，專司前鋒破陣重擊。
+          </p>
+        </div>
+
+        <!-- Soldier card 5 (Jima) -->
+        <div class="glass-card soldier-card" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: #00e5ff;">🔱</span>
+          </div>
+          <h3 class="soldier-name">芝麻 (Jima)</h3>
+          <div class="soldier-class">階級：影之突擊隊長 (魚人首領)</div>
+          <p class="soldier-desc">
+            高階深海傳送門BOSS魚人首領。身形可自由巨大化，手持雙柄三叉戟引動海嘯狂潮，為軍團橫掃敵陣。
+          </p>
+        </div>
+
+        <!-- Soldier card 6 (Tusk) -->
+        <div class="glass-card soldier-card" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: var(--color-tertiary);">🔥</span>
+          </div>
+          <h3 class="soldier-name">牙齒 (Tusk)</h3>
+          <div class="soldier-class">階級：影之領主 (高級咒術師)</div>
+          <p class="soldier-desc">
+            手持紅寶石法杖的半獸人首領。能施展重力屏障、增幅火焰龍捲與全軍嗜血 Buff，是君王最仰賴的群體法術重炮。
+          </p>
+        </div>
+
+        <!-- Soldier card 7 (Kaisel) -->
+        <div class="glass-card soldier-card" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: #ffffff;">🐉</span>
+          </div>
+          <h3 class="soldier-name">凱瑟 (Kaisel)</h3>
+          <div class="soldier-class">階級：影之坐騎 (飛天巨龍)</div>
+          <p class="soldier-desc">
+            惡魔王巴蘭坐騎轉化的雙翼飛龍。環繞暗黑雷暴在天際極速巡航，載乘君王以音速俯衝戰場。
+          </p>
+        </div>
+
+        <!-- Soldier card 8 (Iron) -->
+        <div class="glass-card soldier-card" style="grid-column: span 3;">
+          <div class="soldier-avatar-container">
+            <span class="soldier-avatar-shadow" style="color: #a8a29e;">🛡️</span>
+          </div>
+          <h3 class="soldier-name">鐵甲 (Iron / 金哲)</h3>
+          <div class="soldier-class">階級：影之重盾騎士</div>
+          <p class="soldier-desc">
+            原A級獵人金哲背叛後提取。揮舞重錘與塔盾發動「挑釁怒吼」，吸引敵方全體火力，堅如磐石。
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Arise action CTA block -->
+      <div class="arise-cta-block">
+        <h3 class="headline-md" style="margin-bottom: 20px; color: #ffffff;">對逝去的強者靈魂發出君王呼喚</h3>
+        <p class="body-md" style="margin-bottom: 30px; opacity: 0.8; max-width: 500px; margin-left: auto; margin-right: auto;">
+          當黑色迷霧充斥視網膜，對抗死亡的核心意志即將迸發。現在釋放暗影能量！
+        </p>
+        <button id="arise-btn" class="btn btn-arise">起來吧 (ARISE)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- 🌟 4. COSMIC FACTIONS: MONARCHS VS RULERS (NEW) -->
+  <!-- =================================================== -->
+  <section id="world-factions" class="world-factions-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" style="color: var(--color-secondary);">宇宙創世神話</span>
+        <h2 class="section-title">兩大陣營宿怨 · 支配者 vs 君王</h2>
+        <p class="body-md">
+          創世神「絕對者」將宇宙分裂為光明與黑暗兩大勢力，命其無休止殺戮。地球被夾在神魔神戰之間毀滅過無數次，全憑『輪迴之盃』倒轉時光。
+        </p>
+      </div>
+
+      <!-- Factions Grid -->
+      <div class="factions-comparison-grid">
+
+        <!-- Faction 1: The Rulers (Light) -->
+        <div class="glass-card faction-card ruler-faction-card">
+          <div class="faction-header">
+            <span class="faction-symbol">✨</span>
+            <div>
+              <h3 class="faction-title">光明碎片 · 支配者們 (The Rulers)</h3>
+              <div class="faction-sub">宇宙的守護意志 · 輪迴之盃執掌者</div>
+            </div>
+          </div>
+          <p class="faction-desc">
+            創世神自光明中切割出的神聖戰士。為了保護脆弱的地球不被君王軍團毀滅，他們借用人類肉身降下「最璀璨光輝碎片」，並透過神具『輪迴之盃』一次又一次倒轉時光，試圖尋找拯救地球的方法。
+          </p>
+          <div class="faction-list">
+            <div class="faction-item"><span>神具【輪迴之盃】:</span><span class="glow-text-primary">多次倒轉地球時光</span></div>
+            <div class="faction-item"><span>光輝碎片宿主:</span><span>高建利會長、托馬斯、程日翰</span></div>
+            <div class="faction-item"><span>終極手段:</span><span>以神罰光矛降臨裁決君王</span></div>
+          </div>
+        </div>
+
+        <!-- Faction 2: The Monarchs (Darkness) -->
+        <div class="glass-card faction-card monarch-faction-card">
+          <div class="faction-header">
+            <span class="faction-symbol">🔥</span>
+            <div>
+              <h3 class="faction-title">黑暗碎片 · 九大君王 (The Monarchs)</h3>
+              <div class="faction-sub">虛空的毀滅意志 · 破滅君王龍帝安塔利斯</div>
+            </div>
+          </div>
+          <p class="faction-desc">
+            創世神自黑暗中誕生的毀滅意志。視殺戮為存在唯一的意義，率領無窮魔獸大軍跨越次元傳送門吞噬凡間。最強者為破滅君王（龍帝安塔利斯），其吐息足以燒盡大洋與大陸。
+          </p>
+          <div class="faction-list">
+            <div class="faction-item"><span>九大君王成員:</span><span>龍帝安塔利斯、太祖萊吉亞、百獸、酷寒、瘟疫、幻界、金剛等</span></div>
+            <div class="faction-item"><span>唯一恐懼:</span><span>不死不滅的暗影君王阿斯木</span></div>
+            <div class="faction-item"><span>作戰策略:</span><span>加拿大調虎離山、八門齊開滅世</span></div>
+          </div>
+        </div>
+
+        <!-- Special Node: Shadow Sovereign (Bridge) -->
+        <div class="glass-card faction-card sovereign-anomaly-card" style="grid-column: 1 / -1;">
+          <div class="faction-header">
+            <span class="faction-symbol">👑</span>
+            <div>
+              <h3 class="faction-title">唯一超越神魔的特異點 · 暗影君王 (Shadow Sovereign)</h3>
+              <div class="faction-sub">阿斯木 (Ashborn) ➔ 唯一繼承者：成振宇 (Sung Jin-Woo)</div>
+            </div>
+          </div>
+          <p class="faction-desc">
+            初代暗影君王阿斯木原為支配者中的大哥，因同袍背叛轉投君王，又遭君王背叛重創。他看中了成振宇在死亡絕境中展現的鋼鐵意志，將全部暗影本源託付於他。成振宇以人類肉身承載真神神格，最終在次元裂縫中孤身蕩平所有君王，超越光明與黑暗，成為宇宙唯一的救世孤神！
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- 🌟 5. AHJIN GUILD & ALLIES SHOWCASE (NEW) -->
+  <!-- =================================================== -->
+  <section id="guild-allies" class="guild-allies-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle" style="color: var(--color-primary);">公會與同袍錄</span>
+        <h2 class="section-title">嘯牙公會 (Ahjin Guild) 與關鍵盟友</h2>
+        <p class="body-md">
+          世上人數最精簡、戰力最恐怖的公會。見證那些陪伴成振宇走過生死之戰的摯友與同袍！
+        </p>
+      </div>
+
+      <div class="grid-12 guild-allies-grid">
+
+        <!-- Member 1: Sung Jin-Woo -->
+        <div class="glass-card ally-card" style="grid-column: span 3;">
+          <div class="ally-avatar-ring ring-gold">
+            <span class="ally-avatar-emoji">👑</span>
+          </div>
+          <h3 class="ally-name">成振宇 (會長)</h3>
+          <div class="ally-role text-glow-purple">暗影君王 / 嘯牙公會會長</div>
+          <p class="ally-desc">
+            全人類唯一能無限成長的獵人。掌控數十萬不死暗影軍團，獨自一人扛下滅世神戰。
+          </p>
+        </div>
+
+        <!-- Member 2: Yoo Jin-Ho -->
+        <div class="glass-card ally-card" style="grid-column: span 3;">
+          <div class="ally-avatar-ring ring-blue">
+            <span class="ally-avatar-emoji">💼</span>
+          </div>
+          <h3 class="ally-name">劉晨浩 (副會長)</h3>
+          <div class="ally-role text-glow-blue">副會長 / 財閥二代 / 忠犬小弟</div>
+          <p class="ally-desc">
+            從最初被拯救便全心追隨成哥。全權打理嘯牙公會一切繁瑣事務與法律門檻，即使遭酷刑凌虐也絕不背叛成哥。
+          </p>
+        </div>
+
+        <!-- Member 3: Yoo Soo-Hyun -->
+        <div class="glass-card ally-card" style="grid-column: span 3;">
+          <div class="ally-avatar-ring ring-cyan">
+            <span class="ally-avatar-emoji">✨</span>
+          </div>
+          <h3 class="ally-name">劉蘇嫻 (社員)</h3>
+          <div class="ally-role">知名模特名媛 / 劉晨浩表姊</div>
+          <p class="ally-desc">
+            擁有獵人執照的知名名媛。為了幫助晨浩湊齊公會成立法定的三人門檻而加入嘯牙公會，成為公會門面擔當。
+          </p>
+        </div>
+
+        <!-- Member 4: Cha Hae-In -->
+        <div class="glass-card ally-card" style="grid-column: span 3;">
+          <div class="ally-avatar-ring ring-purple">
+            <span class="ally-avatar-emoji">🌸</span>
+          </div>
+          <h3 class="ally-name">車海印 (車車)</h3>
+          <div class="ally-role text-glow-purple">S級舞姬獵人 / 最想入會者</div>
+          <p class="ally-desc">
+            嗅覺敏銳的S級女劍聖，唯獨在成振宇身旁能聞到舒適清香。遊樂園摩天輪約會名場面，最終與成振宇結為神仙眷侶。
+          </p>
+        </div>
+
+        <!-- Ally 5: Go Gun-Hee -->
+        <div class="glass-card ally-card" style="grid-column: span 4;">
+          <div class="ally-avatar-ring ring-gold">
+            <span class="ally-avatar-emoji">🕊️</span>
+          </div>
+          <h3 class="ally-name">高建利 (會長)</h3>
+          <div class="ally-role text-glow-blue">韓國獵人協會會長 / 最璀璨光輝碎片</div>
+          <p class="ally-desc">
+            成振宇最尊敬的長輩。力排眾議授予主角單人攻略特權，臨終前將人類命運託付給主角，英勇殞落。
+          </p>
+        </div>
+
+        <!-- Ally 6: Thomas Andre -->
+        <div class="glass-card ally-card" style="grid-column: span 4;">
+          <div class="ally-avatar-ring ring-gold">
+            <span class="ally-avatar-emoji">🦁</span>
+          </div>
+          <h3 class="ally-name">托馬斯·安德烈</h3>
+          <div class="ally-role text-glow-purple">美國國家級獵人 / 清道夫公會會長</div>
+          <p class="ally-desc">
+            身軀無敵的世界最強肉盾。被成振宇按在地上摩擦後打服，親自贈予卡米什短劍，在首爾戰役中捨命替主角扛戰。
+          </p>
+        </div>
+
+        <!-- Ally 7: Sung Il-Hwan -->
+        <div class="glass-card ally-card" style="grid-column: span 4;">
+          <div class="ally-avatar-ring ring-blue">
+            <span class="ally-avatar-emoji">🌅</span>
+          </div>
+          <h3 class="ally-name">程日翰 (父親)</h3>
+          <div class="ally-role text-glow-cyan">傳奇獵人 / 支配者光明使者</div>
+          <p class="ally-desc">
+            在地下城失蹤多年的父親。為保護覺醒中的兒子隻身阻擋君王，動用全部光輝碎片神力後，在兒子懷中化灰消散。
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Weapons Arsenal -->
+  <section class="weapons-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">神級魔力兵刃</span>
+        <h2 class="section-title">傳奇匕首與致命短劍</h2>
+        <p class="body-md">
+          精巧而極富殺傷力的短刃是影之君王的首選。這些神兵利器為每一次暗影揮擊提供致命的穿透力。
+        </p>
+      </div>
+
+      <div class="weapon-grid">
+        <!-- Weapon 1 -->
+        <div class="glass-card weapon-card">
+          <div>
+            <div class="weapon-header">
+              <span class="chip">S-RANK</span>
+              <span class="weapon-rank">SS</span>
+            </div>
+            <div class="weapon-illust">
+              <svg class="weapon-illust-svg" viewBox="0 0 24 24">
+                <path d="M18 2l4 4L8 20H4v-4L18 2zM14 6l4 4"/>
+              </svg>
+            </div>
+            <h3 class="headline-md" style="font-size: 20px; margin-bottom: 8px; color: #ffffff;">卡米什的狂怒 (Wrath)</h3>
+            <p class="body-md" style="font-size: 13px;">
+              托馬斯·安德烈致贈。使用傳奇巨龍「卡米什」最銳利的尖牙熔鑄的雙短刃。蘊含極致龍威，能撕碎世間萬物防禦。
+            </p>
+          </div>
+          <div class="weapon-stats">
+            <div class="weapon-stat">
+              <span class="weapon-stat-lbl">魔力攻擊加成</span>
+              <span class="weapon-stat-val text-glow-blue">+1,500</span>
+            </div>
+            <div class="weapon-stat">
+              <span class="weapon-stat-lbl">龍威壓制</span>
+              <span class="weapon-stat-val text-glow-purple">觸發</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weapon 2 -->
+        <div class="glass-card weapon-card">
+          <div>
+            <div class="weapon-header">
+              <span class="chip chip-secondary">S-RANK</span>
+              <span class="weapon-rank">S</span>
+            </div>
+            <div class="weapon-illust">
+              <svg class="weapon-illust-svg" viewBox="0 0 24 24">
+                <path d="M19 2L5 16h3l11-11v-3zM2 22l6-6-2-2-6 6v2z"/>
+              </svg>
+            </div>
+            <h3 class="headline-md" style="font-size: 20px; margin-bottom: 8px; color: #ffffff;">惡魔王之短劍 (Daggers)</h3>
+            <p class="body-md" style="font-size: 13px;">
+              戰勝惡魔王巴蘭的戰利品。雙手持有能大幅度增加敏捷，並引動狂暴雷擊。
+            </p>
+          </div>
+          <div class="weapon-stats">
+            <div class="weapon-stat">
+              <span class="weapon-stat-lbl">速度係數</span>
+              <span class="weapon-stat-val text-glow-blue">+80</span>
+            </div>
+            <div class="weapon-stat">
+              <span class="weapon-stat-lbl">雷暴之眼</span>
+              <span class="weapon-stat-val text-glow-purple">機率</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weapon 3 -->
+        <div class="glass-card weapon-card">
+          <div>
+            <div class="weapon-header">
+              <span class="chip">B-RANK</span>
+              <span class="weapon-rank">B</span>
+            </div>
+            <div class="weapon-illust">
+              <svg class="weapon-illust-svg" viewBox="0 0 24 24">
+                <path d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </div>
+            <h3 class="headline-md" style="font-size: 20px; margin-bottom: 8px; color: #ffffff;">騎士殺手 (Knight Killer)</h3>
+            <p class="body-md" style="font-size: 13px;">
+              由高級獵人公會研發的穿甲匕首。專為對付重鎧甲魔物或巨力首領設計。
+            </p>
+          </div>
+          <div class="weapon-stats">
+            <div class="weapon-stat">
+              <span class="weapon-stat-lbl">破甲穿透</span>
+              <span class="weapon-stat-val text-glow-blue">+30%</span>
+            </div>
+            <div class="weapon-stat">
+              <span class="weapon-stat-lbl">對硬重物傷害</span>
+              <span class="weapon-stat-val text-glow-purple">+15%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Epic Moments Gallery -->
+  <section class="gallery-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">史詩繪卷</span>
+        <h2 class="section-title">雙重地下城與君王降臨</h2>
+        <p class="body-md">
+          在生與死的狹隘邊際，神魔之間的殘酷試煉在此演繹。一瞥影之君王崛起的史詩戰歌。
+        </p>
+      </div>
+
+      <div class="gallery-container">
+        <!-- Gallery Item 1 -->
+        <div class="gallery-item">
+          <img src="assets/dungeon.jpg" alt="Double Dungeon god statue scene" class="gallery-img">
+          <div class="gallery-info-overlay">
+            <h3 class="gallery-title">雙重地下城：噩夢的起點</h3>
+            <p class="gallery-desc">
+              冰冷肅殺的巨神像佇立於高塔殿堂。最弱獵人成振宇在此奉獻自我，並在廢墟殘骸中作為系統覺醒者重生。
+            </p>
+          </div>
+        </div>
+
+        <!-- Gallery Item 2 -->
+        <div class="gallery-item">
+          <img src="assets/monarch.jpg" alt="Shadow Sovereign descent scene" class="gallery-img">
+          <div class="gallery-info-overlay">
+            <h3 class="gallery-title">暗影君王降臨：起來吧</h3>
+            <p class="gallery-desc">
+              不滅的黑影在星河之下凝聚，萬千死靈的膝蓋為之彎曲。死神降臨人間，世界隨之顫抖。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Global Achievements (成果指標) -->
+  <section class="achievements-section">
+    <div class="container">
+      <div class="achievements-grid">
+        <!-- Item 1 -->
+        <div class="glass-card achievement-card">
+          <div class="achievement-num roll-counter" data-target="14.3" data-decimal="true" data-suffix="B+">0B+</div>
+          <h4 class="achievement-title">累計閱讀量</h4>
+          <p class="achievement-desc">全球各大漫畫平台累計瀏覽次數，締造跨國界神話里程碑。</p>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="glass-card achievement-card">
+          <div class="achievement-num roll-counter" data-target="2024" data-decimal="false" data-suffix="">0</div>
+          <h4 class="achievement-title">史詩動畫化</h4>
+          <p class="achievement-desc">2024年震撼開播，由澤野弘之等頂級製作團隊傾力呈現。</p>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="glass-card achievement-card">
+          <div class="achievement-num roll-counter" data-target="180" data-decimal="false" data-suffix="+">0+</div>
+          <h4 class="achievement-title">連載章節</h4>
+          <p class="achievement-desc">高品質連載內容，以細緻的分鏡與震撼格鬥張力備受讚譽。</p>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="glass-card achievement-card">
+          <div class="achievement-num roll-counter" data-target="9.8" data-decimal="true" data-suffix="/10">0/10</div>
+          <h4 class="achievement-title">全球綜合評分</h4>
+          <p class="achievement-desc">全球動漫與輕小說評價平台，萬千擁躉聯合給出的巔峰讚賞。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="logo" style="font-size: 24px;">
+        SHADOW SOVEREIGN
+      </div>
+      <div class="footer-links">
+        <a href="#lore-section" class="footer-link">獵人體系</a>
+        <a href="#campaign-section" class="footer-link">實戰戰役</a>
+        <a href="#features-section" class="footer-link">系統面板</a>
+        <a href="#story-chronicle" class="footer-link">史詩編年史</a>
+        <a href="#arise-quote-section" class="footer-link">站起來！</a>
+        <a href="#shadow-army" class="footer-link">暗影軍團</a>
+        <a href="#world-factions" class="footer-link">兩大陣營</a>
+        <a href="#guild-allies" class="footer-link">嘯牙公會</a>
+      </div>
+      <div class="footer-copy">
+        &copy; 2026 Solo Leveling Showcase. Inspired by D&C Media / Webtoon. Programmed by Antigravity.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script logic -->
+  <script src="app.js"></script>
+</body>
+</html>

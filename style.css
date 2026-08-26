@@ -1,0 +1,3099 @@
+/* ==========================================
+   SHADOW SOVEREIGN DESIGN SYSTEM
+   Inspired by Solo Leveling "The System" HUD
+   ========================================== */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700;900&display=swap');
+
+:root {
+  /* Color Tokens */
+  --bg-base: #0a0a12;
+  --bg-surface: #12121a;
+  --bg-surface-dim: #13131b;
+  --bg-surface-bright: #393842;
+  --bg-container: #1f1f27;
+  --bg-container-low: #1b1b23;
+  --bg-container-lowest: #0d0d16;
+  --bg-container-high: #292932;
+  --bg-container-highest: #34343d;
+  --bg-input: #050508;
+  
+  --color-primary: #adc6ff;         /* Electric Blue */
+  --color-primary-dim: #4d8eff;     /* Active highlight Blue */
+  --color-on-primary: #002e6a;
+  --color-secondary: #d0bcff;       /* Intense Purple */
+  --color-secondary-dim: #571bc1;   /* Mana Purple */
+  --color-on-secondary: #3c0091;
+  --color-tertiary: #4cd7f6;        /* Information Cyan */
+  --color-on-tertiary: #003640;
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  
+  --color-text: #e4e1ed;
+  --color-text-variant: #c2c6d6;
+  --color-outline: #8c909f;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-glow: rgba(77, 142, 255, 0.4);
+  
+  /* Gradients */
+  --accent-gradient: linear-gradient(135deg, var(--color-primary-dim), var(--color-secondary-dim));
+  --text-gradient: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  --mana-gradient: linear-gradient(90deg, #4d8eff 0%, #a855f7 100%);
+  
+  /* Rounded Tokens */
+  --radius-sm: 0.5rem;
+  --radius-default: 1rem;
+  --radius-md: 1.5rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-base: 8px;
+  --container-max: 1280px;
+  --gutter: 24px;
+}
+
+/* ==========================================
+   Base Styles & Reset
+   ========================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--color-text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-container-lowest);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-container-high);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--bg-container-lowest);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dim);
+}
+
+/* Custom Cursor (Optional elements) */
+.custom-cursor {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-primary);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background-color 0.2s;
+  mix-blend-mode: difference;
+  display: none; /* Hide on mobile/touch, enabled dynamically in JS */
+}
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-secondary);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+/* Background Ambient Grid */
+.ambient-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(173, 198, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(173, 198, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center center;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ambient-auras {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.aura-1 {
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(87, 27, 193, 0.15) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: pulse-aura 15s infinite alternate;
+}
+
+.aura-2 {
+  position: absolute;
+  bottom: 10%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(77, 142, 255, 0.15) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: pulse-aura 18s infinite alternate-reverse;
+}
+
+@keyframes pulse-aura {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.2) translate(50px, 30px); }
+}
+
+/* ==========================================
+   Typography & Typography Helpers
+   ========================================== */
+.display-lg {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: var(--text-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.headline-lg {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.headline-md {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.body-lg {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-text-variant);
+}
+
+.body-md {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-text-variant);
+}
+
+.label-md {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.text-glow-blue {
+  text-shadow: 0 0 10px rgba(173, 198, 255, 0.5);
+}
+
+.text-glow-purple {
+  text-shadow: 0 0 10px rgba(208, 188, 255, 0.5);
+}
+
+.glow-text-primary {
+  color: var(--color-primary);
+  text-shadow: 0 0 8px rgba(173, 198, 255, 0.4);
+}
+
+/* ==========================================
+   Layout & Container Components
+   ========================================== */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gutter);
+}
+
+section {
+  padding: 80px 0;
+  position: relative;
+}
+
+/* Glassmorphism Surface/Cards */
+.glass-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-default);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--color-primary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 0 20px rgba(77, 142, 255, 0.2);
+  transform: translateY(-4px);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.glass-card-lg {
+  border-radius: var(--radius-lg);
+  padding: 40px;
+}
+
+/* Glassmorphism Overlays ("System Windows") */
+.system-overlay {
+  background: rgba(13, 13, 22, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-default);
+  color: var(--color-text);
+}
+
+/* ==========================================
+   Navigation Bar
+   ========================================== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(10, 10, 18, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-border);
+  padding: 16px 0;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  background: var(--text-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  animation: logo-spin 6s linear infinite;
+}
+
+.logo-icon::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+}
+
+@keyframes logo-spin {
+  100% { transform: rotate(360deg); }
+}
+
+.nav-hud-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hud-item {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+}
+
+.hud-dot.pulse {
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ==========================================
+   Buttons
+   ========================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(87, 27, 193, 0.4);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 20px rgba(77, 142, 255, 0.5), 0 4px 20px rgba(87, 27, 193, 0.5);
+  transform: scale(1.03);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-outline);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(77, 142, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 12px;
+}
+
+/* ==========================================
+   Chips / Badges
+   ========================================== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(173, 198, 255, 0.08);
+  color: var(--color-primary);
+  border: 1px solid rgba(173, 198, 255, 0.15);
+}
+
+.chip-secondary {
+  background: rgba(208, 188, 255, 0.08);
+  color: var(--color-secondary);
+  border: 1px solid rgba(208, 188, 255, 0.15);
+}
+
+.chip-danger {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+/* ==========================================
+   Hero Section
+   ========================================== */
+.hero {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 120px;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(rgba(10, 10, 18, 0.8) 0%, rgba(10, 10, 18, 0.95) 100%);
+}
+
+.hero-bg-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.hero-content {
+  text-align: center;
+  max-width: 800px;
+  z-index: 10;
+}
+
+.system-status-indicator {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.system-status-indicator::before,
+.system-status-indicator::after {
+  content: '';
+  display: inline-block;
+  width: 40px;
+  height: 1px;
+  background: var(--accent-gradient);
+}
+
+.hero-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 64px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 24px;
+  background: linear-gradient(to right, #ffffff, #adc6ff, #d0bcff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-desc {
+  font-size: 20px;
+  color: var(--color-text-variant);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* Floating System Notification HUD popup */
+.floating-hud-notice {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 320px;
+  background: rgba(18, 18, 26, 0.85);
+  border: 1px solid var(--color-primary-dim);
+  border-radius: var(--radius-default);
+  padding: 16px 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(77, 142, 255, 0.15);
+  z-index: 100;
+  animation: slide-up 1s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.hud-notice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.hud-notice-title {
+  color: var(--color-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hud-notice-time {
+  font-size: 10px;
+  color: var(--color-outline);
+}
+
+.hud-notice-content {
+  font-size: 13px;
+  color: var(--color-text-variant);
+}
+
+.hud-notice-close {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--color-outline);
+  font-size: 14px;
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(100px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ==========================================
+   Lore / Worldview Section
+   ========================================== */
+.lore-section {
+  background-color: var(--bg-container-lowest);
+}
+
+.section-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 60px;
+}
+
+.section-subtitle {
+  color: var(--color-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+/* Hunter Rank Interface */
+.rank-showcase-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.rank-selector-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rank-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-variant);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.rank-btn.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(173, 198, 255, 0.1);
+  box-shadow: 0 0 15px rgba(173, 198, 255, 0.3);
+  transform: scale(1.15);
+}
+
+.rank-btn:hover:not(.active) {
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+  transform: translateY(-3px);
+}
+
+.rank-btn-s { text-shadow: 0 0 8px rgba(173, 198, 255, 0.6); }
+.rank-btn-a { text-shadow: 0 0 8px rgba(208, 188, 255, 0.6); }
+
+.rank-detail-card {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 40px;
+  align-items: center;
+  min-height: 250px;
+}
+
+.rank-display-badge {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(18, 18, 26, 0.9) 0%, rgba(13, 13, 21, 0.95) 100%);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.rank-display-badge::before {
+  content: '';
+  position: absolute;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-default);
+  pointer-events: none;
+}
+
+.badge-rank-letter {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 110px;
+  line-height: 1;
+  background: var(--text-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(173, 198, 255, 0.3));
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.badge-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--color-outline);
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+
+.rank-info-content h3 {
+  font-size: 28px;
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.rank-info-desc {
+  font-size: 16px;
+  color: var(--color-text-variant);
+  margin-bottom: 24px;
+}
+
+.rank-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.rank-stat-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 16px;
+  border-radius: var(--radius-default);
+}
+
+.rank-stat-label {
+  font-size: 11px;
+  color: var(--color-outline);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.rank-stat-val {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-primary);
+}
+
+/* Awakening Interactive Area */
+.awakening-banner {
+  background: linear-gradient(135deg, rgba(87, 27, 193, 0.2) 0%, rgba(77, 142, 255, 0.1) 100%);
+  border: 1px solid var(--color-primary-dim);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  margin-top: 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.awakening-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(173, 198, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.awakening-portal-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  border-top-color: transparent;
+  margin: 0 auto 20px;
+  position: relative;
+  animation: spin 3s linear infinite;
+  box-shadow: 0 0 15px rgba(77, 142, 255, 0.2);
+}
+
+.awakening-portal-ring::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  border-radius: 50%;
+  border: 2px solid var(--color-secondary);
+  border-bottom-color: transparent;
+  animation: spin 1.5s linear infinite reverse;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   Core Features Showcase
+   ========================================== */
+.features-section {
+  background-color: var(--bg-base);
+}
+
+/* Character HUD Stats simulator */
+.stats-hud {
+  grid-column: span 5;
+}
+
+.stats-hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.stats-hud-level {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
+.stats-hud-job {
+  font-size: 12px;
+  color: var(--color-outline);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+.mana-bar-container {
+  margin-bottom: 24px;
+}
+
+.mana-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-text-variant);
+}
+
+.mana-bar-track {
+  height: 8px;
+  background-color: var(--bg-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mana-bar-fill {
+  height: 100%;
+  background: var(--mana-gradient);
+  border-radius: var(--radius-full);
+  width: 75%;
+  position: relative;
+}
+
+.mana-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%
+  );
+  animation: pulse-progress 2s infinite linear;
+  background-size: 200% 100%;
+}
+
+@keyframes pulse-progress {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.stats-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 80px 40px 1fr 60px;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.stat-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: 'Montserrat', sans-serif;
+  text-align: right;
+}
+
+.stat-progress-track {
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.stat-progress-fill {
+  height: 100%;
+  background: var(--color-primary-dim);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+.stat-btn-plus {
+  background: rgba(173, 198, 255, 0.1);
+  border: 1px solid rgba(173, 198, 255, 0.2);
+  color: var(--color-primary);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.stat-btn-plus:hover {
+  background: var(--color-primary-dim);
+  color: var(--color-on-primary);
+  box-shadow: 0 0 10px rgba(77, 142, 255, 0.5);
+  transform: scale(1.08);
+}
+
+.stat-btn-plus:active, .stat-btn-plus.pressing {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(77, 142, 255, 0.9);
+  transform: scale(1.18);
+}
+
+.stat-points-remaining {
+  font-size: 13px;
+  color: var(--color-outline);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-border);
+}
+
+/* Feature Cards side column */
+.features-side {
+  grid-column: span 7;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+.feature-panel {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.feature-icon-wrapper {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-default);
+  padding: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-panel:hover .feature-icon-wrapper {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 15px rgba(77, 142, 255, 0.2);
+  color: var(--color-primary);
+}
+
+.feature-icon-wrapper svg {
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  transition: stroke 0.3s ease;
+}
+
+.feature-panel-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.feature-panel-desc {
+  font-size: 14px;
+  color: var(--color-text-variant);
+  line-height: 1.5;
+}
+
+/* ==========================================
+   Shadow Army Section ("Arise")
+   ========================================== */
+.shadow-army-section {
+  background-color: var(--bg-container-lowest);
+  position: relative;
+  z-index: 10;
+}
+
+/* Arise visual effect layer overlay */
+.arise-overlay-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(87, 27, 193, 0.2) 0%, rgba(10, 10, 18, 0.95) 100%);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.arise-overlay-effect.active {
+  opacity: 1;
+}
+
+.arise-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--color-secondary);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+}
+
+.shadow-soldier-grid {
+  margin-top: 40px;
+}
+
+.soldier-card {
+  text-align: center;
+}
+
+.soldier-avatar-container {
+  width: 100%;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-default);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition: border-color 0.3s ease;
+}
+
+.soldier-card:hover .soldier-avatar-container {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 15px rgba(208, 188, 255, 0.2);
+}
+
+.soldier-avatar-shadow {
+  font-size: 80px;
+  opacity: 0.15;
+  filter: drop-shadow(0 0 5px var(--color-secondary-dim));
+  transition: all 0.5s ease;
+}
+
+.soldier-card:hover .soldier-avatar-shadow {
+  opacity: 0.8;
+  transform: scale(1.1) rotate(5deg);
+  filter: drop-shadow(0 0 15px var(--color-secondary));
+}
+
+.soldier-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+
+.soldier-class {
+  font-size: 12px;
+  color: var(--color-outline);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.soldier-desc {
+  font-size: 13px;
+  color: var(--color-text-variant);
+  line-height: 1.5;
+}
+
+.arise-cta-block {
+  text-align: center;
+  margin-top: 60px;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-arise {
+  font-size: 18px;
+  padding: 16px 44px;
+  background: linear-gradient(135deg, #1e1b4b 0%, #31106b 50%, #4c1d95 100%);
+  color: #ffffff;
+  border: 2px solid var(--color-secondary);
+  box-shadow: 0 0 25px rgba(87, 27, 193, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-arise::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(208, 188, 255, 0.4) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.btn-arise:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(208, 188, 255, 0.6), 0 0 15px rgba(87, 27, 193, 0.8);
+}
+
+.btn-arise:hover::after {
+  opacity: 1;
+}
+
+.btn-arise:active {
+  transform: scale(0.98);
+}
+
+/* ==========================================
+   Weapons Arsenal Section
+   ========================================== */
+.weapons-section {
+  background-color: var(--bg-base);
+}
+
+.weapon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gutter);
+}
+
+.weapon-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.weapon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.weapon-rank {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--color-secondary);
+  line-height: 1;
+}
+
+.weapon-illust {
+  height: 160px;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: var(--radius-default);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.weapon-illust-svg {
+  width: 100px;
+  height: 100px;
+  stroke: var(--color-outline);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.3;
+  transition: all 0.3s ease;
+}
+
+.weapon-card:hover .weapon-illust-svg {
+  stroke: var(--color-primary);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 8px rgba(77, 142, 255, 0.6));
+  transform: rotate(-10deg) scale(1.1);
+}
+
+.weapon-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 16px;
+}
+
+.weapon-stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.weapon-stat-lbl {
+  color: var(--color-outline);
+}
+
+.weapon-stat-val {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* ==========================================
+   Epic Moments Gallery Section
+   ========================================== */
+.gallery-section {
+  background-color: var(--bg-container-lowest);
+}
+
+.gallery-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gutter);
+}
+
+.gallery-item {
+  height: 320px;
+  position: relative;
+  border-radius: var(--radius-default);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.gallery-item:hover .gallery-img {
+  transform: scale(1.05);
+}
+
+.gallery-info-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to top, rgba(10, 10, 18, 0.95) 0%, rgba(10, 10, 18, 0.6) 50%, transparent 100%);
+  padding: 24px;
+  z-index: 10;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gallery-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
+.gallery-desc {
+  font-size: 13px;
+  color: var(--color-text-variant);
+}
+
+/* ==========================================
+   Global Achievements Section
+   ========================================== */
+.achievements-section {
+  background-color: var(--bg-base);
+  border-top: 1px solid var(--color-border);
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gutter);
+}
+
+.achievement-card {
+  text-align: center;
+}
+
+.achievement-num {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  background: var(--text-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  line-height: 1.1;
+  text-shadow: 0 0 10px rgba(173, 198, 255, 0.2);
+}
+
+.achievement-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.achievement-desc {
+  font-size: 12px;
+  color: var(--color-outline);
+}
+
+/* ==========================================
+   System Notification Modal / Overlay Popup
+   ========================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 5, 8, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.system-window {
+  width: 90%;
+  max-width: 480px;
+  border: 1px solid var(--color-primary-dim);
+  background: rgba(18, 18, 26, 0.95);
+  border-radius: var(--radius-default);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(77, 142, 255, 0.25);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+}
+
+.modal-overlay.active .system-window {
+  transform: scale(1);
+}
+
+.system-window-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.system-window-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.system-window-close {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--color-outline);
+  font-size: 18px;
+  transition: color 0.2s;
+}
+
+.system-window-close:hover {
+  color: var(--color-primary);
+}
+
+.system-window-body {
+  padding: 24px;
+}
+
+.system-quest-icon {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--color-secondary);
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 30px;
+  color: var(--color-secondary);
+  box-shadow: 0 0 15px rgba(208, 188, 255, 0.3);
+}
+
+/* Upgraded System Quest Window */
+.system-quest-window {
+  max-width: 520px;
+}
+
+.quest-header-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.quest-status-badge {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 215, 0, 0.12);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  margin-top: -6px;
+  margin-bottom: 8px;
+}
+
+.quest-status-badge.completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+.quest-checklist-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-default);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.quest-checklist-title {
+  font-size: 11px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.quest-check-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  color: var(--color-text-variant);
+}
+
+.quest-check-item:last-child {
+  border-bottom: none;
+}
+
+.quest-check-item .check-icon {
+  color: #10b981;
+  font-weight: 900;
+  margin-right: 8px;
+}
+
+.quest-check-item .check-text {
+  flex-grow: 1;
+}
+
+.quest-check-item .check-progress {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-primary);
+}
+
+.quest-countdown-timer {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-variant);
+  text-align: center;
+  margin-bottom: 18px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.quest-countdown-timer span {
+  color: var(--color-secondary);
+  letter-spacing: 0.1em;
+}
+
+button:disabled, .btn:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: grayscale(0.8) !important;
+}
+
+.system-quest-title {
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.system-quest-desc {
+  font-size: 14px;
+  color: var(--color-text-variant);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.system-quest-rewards {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-default);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.system-quest-rewards-title {
+  font-size: 11px;
+  color: var(--color-outline);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.system-reward-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.system-reward-item:last-child {
+  margin-bottom: 0;
+}
+
+.system-quest-btn-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* Screen levelup flash alert overlay */
+.levelup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(13, 13, 21, 0.95) 100%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.levelup-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.levelup-banner-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 72px;
+  color: var(--color-primary);
+  text-shadow: 0 0 30px rgba(173, 198, 255, 0.8), 0 0 50px rgba(87, 27, 193, 0.6);
+  letter-spacing: 0.1em;
+  animation: scale-bounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
+}
+
+.levelup-banner-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3em;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+@keyframes scale-bounce {
+  0% { transform: scale(0.95); }
+  100% { transform: scale(1.05); }
+}
+
+/* ==========================================
+   Footer
+   ========================================== */
+.footer {
+  border-top: 1px solid var(--color-border);
+  padding: 40px 0;
+  background-color: var(--bg-container-lowest);
+  text-align: center;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-link {
+  color: var(--color-outline);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: var(--color-primary);
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--color-outline);
+}
+
+/* ==========================================
+   Responsive Breakpoints
+   ========================================== */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 48px;
+  }
+  .grid-12 {
+    gap: 16px;
+  }
+  .stats-hud {
+    grid-column: span 12;
+  }
+  .features-side {
+    grid-column: span 12;
+  }
+  .weapon-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 0;
+  }
+  .nav-hud-info {
+    display: none; /* Hide details on mobile HUD */
+  }
+  .hero-title {
+    font-size: 38px;
+  }
+  .hero-desc {
+    font-size: 16px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .rank-detail-card {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .weapon-grid {
+    grid-template-columns: 1fr;
+  }
+  .gallery-container {
+    grid-template-columns: 1fr;
+  }
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+  .floating-hud-notice {
+    display: none; /* Hide floating notice on mobile to avoid clutter */
+  }
+  .section-title {
+    font-size: 28px;
+  }
+}
+
+/* ==========================================
+   Story Campaign Action Combat Mode Styles
+   ========================================== */
+.campaign-section {
+  background-color: var(--bg-container-lowest);
+  position: relative;
+}
+
+.campaign-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.campaign-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.campaign-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-full);
+}
+
+.campaign-list::-webkit-scrollbar-thumb {
+  background: var(--color-primary-dim);
+  border-radius: var(--radius-full);
+}
+
+.campaign-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  padding: 10px 12px;
+  border-radius: var(--radius-default);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.campaign-item:hover:not(.locked) {
+  border-color: var(--color-primary);
+  background: rgba(173, 198, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.campaign-item.active {
+  border-color: var(--color-primary) !important;
+  background: rgba(173, 198, 255, 0.1) !important;
+  box-shadow: 0 0 15px rgba(77, 142, 255, 0.25);
+}
+
+.campaign-item.locked {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.act-num {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--color-outline);
+}
+
+.campaign-item.active .act-num {
+  color: var(--color-primary);
+}
+
+.act-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.act-difficulty {
+  font-size: 11px;
+  color: var(--color-outline);
+  margin-top: 2px;
+}
+
+/* Campaign Left Panel Mini Stats HUD */
+.campaign-hunter-mini-hud {
+  margin-top: 18px;
+  padding: 12px;
+  background: rgba(18, 18, 26, 0.7);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-default);
+}
+
+.mini-hud-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-outline);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.mini-hud-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 3px 0;
+  color: var(--color-text-variant);
+}
+
+/* Combat Console & Arena Layout */
+.campaign-console {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 520px;
+  background: rgba(18, 18, 26, 0.95);
+  border: 1px solid var(--color-border-glow);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(77, 142, 255, 0.05);
+}
+
+.console-hud-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr;
+  gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.console-player-hp, .console-player-mp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.console-lbl {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.console-player-hp .console-lbl { color: #f87171; }
+.console-player-mp .console-lbl { color: #60a5fa; }
+
+.console-bar-track {
+  flex-grow: 1;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.console-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.15s ease-out;
+}
+
+.hp-fill {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.mp-fill {
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.console-val {
+  font-size: 11px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  min-width: 58px;
+  text-align: right;
+  color: var(--color-text);
+}
+
+.console-mission-objective {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(77, 142, 255, 0.08);
+  border: 1px solid rgba(77, 142, 255, 0.25);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Boss HUD in Combat */
+.console-hud-boss {
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-default);
+  animation: slide-up 0.3s ease-out;
+}
+
+.boss-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.boss-name {
+  color: #ff6b6b;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.boss-phase-tag {
+  font-size: 10px;
+  background: #dc2626;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.1em;
+}
+
+.boss-hp-val {
+  color: #ffb4ab;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.boss-track {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.boss-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dc2626 0%, #f97316 100%);
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+  border-radius: var(--radius-full);
+  transition: width 0.15s linear;
+}
+
+/* Real-Time Combat Canvas Arena Wrapper */
+.combat-arena-wrapper {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  background: radial-gradient(circle at center, #151522 0%, #09090f 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-default);
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+#combat-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+}
+
+/* Combo Counter Floating UI */
+.combat-combo-counter {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  text-align: right;
+  pointer-events: none;
+  z-index: 15;
+  animation: scale-bounce 0.25s ease-out;
+}
+
+.combo-num {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 38px;
+  line-height: 1;
+  background: linear-gradient(135deg, #adc6ff 0%, #d0bcff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(173, 198, 255, 0.6));
+}
+
+.combo-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--color-secondary);
+  display: block;
+}
+
+/* Arena Story Cutscene Overlay */
+.arena-story-overlay, .arena-result-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 18, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.arena-story-card, .arena-result-card {
+  width: 100%;
+  max-width: 580px;
+  background: rgba(18, 18, 28, 0.95);
+  border: 1px solid var(--color-primary-dim);
+  border-radius: var(--radius-default);
+  padding: 28px 32px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(77, 142, 255, 0.25);
+  animation: scale-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.story-badge-indicator {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.arena-story-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.arena-story-desc {
+  font-size: 14px;
+  color: var(--color-text-variant);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.arena-control-guide {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--color-outline);
+}
+
+.guide-item b {
+  color: var(--color-primary);
+}
+
+/* Victory / Defeat Result Modal inside Arena */
+.result-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 42px;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  color: var(--color-primary);
+  text-shadow: 0 0 20px rgba(173, 198, 255, 0.8);
+}
+
+.arena-result-card.defeat .result-title {
+  color: var(--color-error);
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+}
+
+.result-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 6px 0 16px;
+}
+
+.result-rewards {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reward-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-text-variant);
+}
+
+.result-btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Bottom Action & Keyboard Controls Panel */
+.combat-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.combat-key-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.key-tag {
+  font-size: 11px;
+  color: var(--color-outline);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+kbd {
+  background: var(--bg-container-high);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Virtual Touch / Mouse Buttons Bar */
+.virtual-actions-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.v-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-default);
+  padding: 10px 6px;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  overflow: hidden;
+  user-select: none;
+}
+
+.v-btn:hover {
+  background: rgba(173, 198, 255, 0.08);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(77, 142, 255, 0.3);
+}
+
+.v-btn:active {
+  transform: scale(0.96);
+  background: rgba(77, 142, 255, 0.2);
+}
+
+.v-btn-attack {
+  border-color: var(--color-primary-dim);
+  background: rgba(77, 142, 255, 0.06);
+}
+
+.v-btn-dash {
+  border-color: var(--color-tertiary);
+}
+
+.v-btn-ult {
+  border-color: var(--color-secondary);
+  background: rgba(87, 27, 193, 0.15);
+}
+
+.v-btn-icon {
+  font-size: 20px;
+}
+
+.v-btn-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.v-cd-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  transition: height 0.05s linear;
+}
+
+/* Combat Status Banner */
+.combat-mini-log {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(5, 5, 8, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--color-text-variant);
+  margin-top: 8px;
+}
+
+.log-indicator {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Shadow lock styling overlay */
+.soldier-card.soldier-locked {
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.soldier-card.soldier-locked .soldier-avatar-container::after {
+  content: '🔒 LOCKED';
+  position: absolute;
+  background: rgba(10, 10, 18, 0.85);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+.soldier-card.soldier-locked .soldier-avatar-shadow {
+  opacity: 0.05 !important;
+}
+
+@keyframes scale-in {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  .combat-arena-wrapper {
+    height: 340px;
+  }
+  .console-hud-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .console-mission-objective {
+    grid-column: span 2;
+  }
+  .arena-control-guide {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ==========================================
+   NEW EXPANDED SECTIONS STYLING
+   ========================================== */
+
+/* 1. Header Navigation Links Menu */
+.nav-links-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 8px;
+  scrollbar-width: none;
+}
+.nav-links-menu::-webkit-scrollbar {
+  display: none;
+}
+.nav-menu-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-variant);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.nav-menu-link:hover {
+  color: #ffffff;
+  background: rgba(173, 198, 255, 0.1);
+  border-color: rgba(173, 198, 255, 0.3);
+  box-shadow: 0 0 10px rgba(77, 142, 255, 0.2);
+}
+.nav-menu-link.nav-highlight {
+  color: var(--color-primary);
+  border-color: rgba(77, 142, 255, 0.4);
+  background: rgba(77, 142, 255, 0.08);
+}
+
+/* 2. Story Chronicle Section */
+.story-chronicle-section {
+  padding: 100px 0 80px;
+  background: linear-gradient(180deg, rgba(10,10,18,0) 0%, rgba(19,19,27,0.7) 20%, rgba(10,10,18,0.95) 100%);
+  position: relative;
+}
+.chronicle-filter-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+.chronicle-filter-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-variant);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.chronicle-filter-btn:hover {
+  background: rgba(173, 198, 255, 0.1);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+.chronicle-filter-btn.active {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 0 18px rgba(77, 142, 255, 0.4);
+}
+.chronicle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.chronicle-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: var(--radius-md);
+  padding: 28px 24px;
+  background: rgba(18, 18, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.chronicle-card:hover {
+  border-color: var(--color-secondary);
+  box-shadow: 0 12px 32px rgba(208, 188, 255, 0.15), 0 0 15px rgba(77, 142, 255, 0.2);
+  transform: translateY(-6px);
+}
+.chronicle-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.chronicle-index {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--color-primary);
+  background: rgba(77, 142, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(77, 142, 255, 0.25);
+}
+.chronicle-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+.tag-gold {
+  background: rgba(255, 215, 0, 0.12);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+.tag-blue {
+  background: rgba(77, 142, 255, 0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(77, 142, 255, 0.3);
+}
+.tag-purple {
+  background: rgba(208, 188, 255, 0.12);
+  color: var(--color-secondary);
+  border: 1px solid rgba(208, 188, 255, 0.3);
+}
+.tag-cyan {
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--color-tertiary);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+.chronicle-card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+.chronicle-card-quote {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--color-primary);
+  border-left: 2px solid var(--color-secondary);
+  padding: 8px 10px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+  background: rgba(208, 188, 255, 0.03);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.chronicle-card-desc {
+  font-size: 14px;
+  color: var(--color-text-variant);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+.chronicle-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.chronicle-badge {
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  color: var(--color-text-variant);
+}
+.chronicle-actions-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.chronicle-play-btn {
+  flex: 1.15;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 0 10px rgba(77, 142, 255, 0.2);
+}
+
+.chronicle-play-btn:hover {
+  box-shadow: 0 0 16px rgba(77, 142, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.chronicle-detail-btn {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 3. Chapter Reader Modal */
+.chapter-modal-window {
+  max-width: 680px;
+  width: 90%;
+}
+.chapter-modal-body {
+  padding: 24px;
+}
+.chapter-modal-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.chapter-modal-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+.chapter-modal-quote {
+  font-style: italic;
+  color: var(--color-primary);
+  background: rgba(77, 142, 255, 0.08);
+  border-left: 3px solid var(--color-secondary);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.chapter-modal-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+.chapter-modal-highlights {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-default);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chapter-modal-highlight-item {
+  font-size: 13px;
+  color: var(--color-text-variant);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chapter-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 18px;
+  gap: 10px;
+}
+
+/* 4. Arise Quote Section */
+.arise-quote-section {
+  padding: 80px 0;
+  position: relative;
+  overflow: hidden;
+}
+.arise-quote-hero-box {
+  background: radial-gradient(circle at 50% 30%, rgba(87, 27, 193, 0.25) 0%, rgba(13, 13, 22, 0.95) 75%);
+  border: 1px solid rgba(208, 188, 255, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 60px 40px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 50px rgba(87, 27, 193, 0.2), inset 0 0 40px rgba(77, 142, 255, 0.08);
+}
+.arise-crown-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+  animation: float-pulse 3s ease-in-out infinite;
+}
+.arise-giant-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ffffff 0%, var(--color-primary) 50%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 12px 0 4px;
+  text-shadow: 0 0 30px rgba(77, 142, 255, 0.4);
+}
+.arise-en-sub {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--color-secondary);
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+.arise-manifesto-desc {
+  max-width: 720px;
+  margin: 0 auto 30px;
+  font-size: 16px;
+  color: var(--color-text-variant);
+  line-height: 1.7;
+}
+.mega-arise-action-btn {
+  font-size: 18px;
+  padding: 16px 48px;
+  border-radius: var(--radius-full);
+  margin-bottom: 48px;
+  box-shadow: 0 0 25px rgba(77, 142, 255, 0.4);
+  transition: all 0.3s ease;
+}
+.mega-arise-action-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(208, 188, 255, 0.6);
+}
+.arise-moments-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  text-align: left;
+  margin-top: 20px;
+}
+.moment-card {
+  background: rgba(10, 10, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-default);
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+}
+.moment-card:hover {
+  border-color: var(--color-primary);
+  background: rgba(18, 18, 26, 0.9);
+  transform: translateY(-4px);
+  box-shadow: 0 0 16px rgba(77, 142, 255, 0.25);
+}
+.moment-target {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+.moment-context {
+  font-size: 12px;
+  color: var(--color-outline);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.moment-quote {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 8px;
+  line-height: 1.4;
+}
+
+/* 5. Expanded Shadow Army Styles */
+.grand-marshal-card {
+  border-color: rgba(255, 215, 0, 0.4) !important;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.15) !important;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(18, 18, 26, 0.95) 100%) !important;
+}
+.grand-marshal-card:hover {
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 35px rgba(255, 215, 0, 0.35) !important;
+}
+
+/* 6. Cosmic Factions Styles */
+.world-factions-section {
+  padding: 80px 0;
+  background: rgba(10, 10, 18, 0.5);
+}
+.factions-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.faction-card {
+  border-radius: var(--radius-lg);
+  padding: 36px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ruler-faction-card {
+  border-color: rgba(255, 215, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(18, 18, 26, 0.9) 100%);
+}
+.ruler-faction-card:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+}
+.monarch-faction-card {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(18, 18, 26, 0.9) 100%);
+}
+.monarch-faction-card:hover {
+  border-color: #ef4444;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+}
+.sovereign-anomaly-card {
+  border-color: rgba(208, 188, 255, 0.4);
+  background: linear-gradient(135deg, rgba(87, 27, 193, 0.15) 0%, rgba(77, 142, 255, 0.08) 50%, rgba(18, 18, 26, 0.95) 100%);
+}
+.sovereign-anomaly-card:hover {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 30px rgba(208, 188, 255, 0.35);
+}
+.faction-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.faction-symbol {
+  font-size: 36px;
+}
+.faction-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+}
+.faction-sub {
+  font-size: 13px;
+  color: var(--color-outline);
+}
+.faction-desc {
+  font-size: 14px;
+  color: var(--color-text-variant);
+  line-height: 1.6;
+}
+.faction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+  font-size: 13px;
+}
+.faction-item {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-variant);
+}
+
+/* 7. Ahjin Guild & Allies Styles */
+.guild-allies-section {
+  padding: 80px 0;
+}
+.guild-allies-grid {
+  gap: 20px;
+}
+.ally-card {
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.25s ease;
+}
+.ally-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px rgba(77, 142, 255, 0.2);
+}
+.ally-avatar-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  border: 2px solid;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ring-gold { border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+.ring-blue { border-color: var(--color-primary); box-shadow: 0 0 15px rgba(77, 142, 255, 0.3); }
+.ring-purple { border-color: var(--color-secondary); box-shadow: 0 0 15px rgba(208, 188, 255, 0.3); }
+.ring-cyan { border-color: var(--color-tertiary); box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); }
+.ally-avatar-emoji { font-size: 28px; }
+.ally-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+.ally-role {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.ally-desc {
+  font-size: 13px;
+  color: var(--color-text-variant);
+  line-height: 1.5;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1100px) {
+  .chronicle-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .arise-moments-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .factions-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .chronicle-grid {
+    grid-template-columns: 1fr;
+  }
+  .arise-moments-grid {
+    grid-template-columns: 1fr;
+  }
+  .arise-giant-text {
+    font-size: 42px;
+  }
+  .arise-quote-hero-box {
+    padding: 40px 20px;
+  }
+  .nav-links-menu {
+    display: none; /* Mobile hides top menu bar, preserved in footer */
+  }
+}
+
+/* ==========================================
+   Grand Saga Overview (完結篇四大史詩階段巡禮)
+   ========================================== */
+.saga-overview-section {
+  background: var(--bg-container-lowest);
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0 50px;
+}
+
+.saga-eras-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gutter);
+  margin-top: 30px;
+}
+
+.saga-era-card {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(173, 198, 255, 0.15);
+  background: rgba(18, 18, 28, 0.85);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.saga-era-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-primary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(77, 142, 255, 0.25);
+}
+
+.saga-era-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.saga-era-badge {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.era-badge-blue {
+  background: rgba(77, 142, 255, 0.2);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.era-badge-purple {
+  background: rgba(208, 188, 255, 0.2);
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+}
+
+.era-badge-gold {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  border: 1px solid #ffd700;
+}
+
+.era-badge-cyan {
+  background: rgba(76, 215, 246, 0.2);
+  color: var(--color-tertiary);
+  border: 1px solid var(--color-tertiary);
+}
+
+.saga-era-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.saga-era-desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text-variant);
+  margin-bottom: 20px;
+}
+
+.saga-era-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.saga-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+}
+
+@media (max-width: 900px) {
+  .saga-eras-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes screen-shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(3px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+  40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+@keyframes float-pulse {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.08); }
+}
+
